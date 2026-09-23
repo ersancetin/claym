@@ -3,7 +3,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { DayPicker } from "react-day-picker";
 import { tr } from "date-fns/locale";
 import { isValid, parse } from "date-fns";
-import { Calculator, CalendarDays, Loader2, RotateCcw } from "lucide-react";
+import { Calculator, CalendarDays, Info, Loader2, RotateCcw } from "lucide-react";
 import { cn, d } from "@/lib/utils";
 import { ActuarialEngine } from "@/lib/actuarial-engine";
 
@@ -46,10 +46,11 @@ export const EMPTY_DRAFT: Draft = {
     faultRate: null,
 };
 
-export const legalRetirementAge = (draft: Draft) =>
-    draft.birthDate && draft.accidentDate && draft.accidentDate >= draft.birthDate
-        ? ActuarialEngine.getLegalRetirementAge(draft.birthDate, draft.accidentDate)
-        : null;
+/** Boş bırakılan emeklilik yaşı için Yargıtay uygulaması: herkes için 60 */
+export const legalRetirementAge = (_draft?: Draft) => ActuarialEngine.getLegalRetirementAge();
+
+const generalConditionsAge = (draft: Draft) =>
+    draft.birthDate && draft.accidentDate ? ActuarialEngine.getGeneralConditionsRetirementAge(draft.birthDate, draft.accidentDate) : null;
 
 interface Props {
     draft: Draft;
@@ -65,6 +66,9 @@ interface Props {
 export function ParameterPanel({ draft, errors, busy, stale, hasResult, onChange, onSubmit, onReset }: Props) {
     const set = <K extends keyof Draft>(key: K, value: Draft[K]) => onChange({ ...draft, [key]: value });
     const legal = legalRetirementAge(draft);
+    const gsAge = generalConditionsAge(draft);
+    const effectiveAge = draft.retirementAge ?? legal;
+    const [ageInfo, setAgeInfo] = useState(false);
     const thisYear = new Date().getFullYear();
 
     const submit = (e: FormEvent) => {
@@ -127,23 +131,38 @@ export function ParameterPanel({ draft, errors, busy, stale, hasResult, onChange
                 />
 
                 <NumberField
-                    label="Emeklilik yaşı"
+                    label="Emeklilik yaşı (pasif dönem başlangıcı)"
                     suffix="yaş"
                     value={draft.retirementAge}
                     error={errors.retirementAge}
                     onChange={(v) => set("retirementAge", v)}
                     max={80}
-                    placeholder={legal !== null ? String(legal) : "Yasal yaş"}
-                    hint={
-                        legal !== null
-                            ? draft.retirementAge === null
-                                ? `Boş bırakılırsa yasal sınır ${legal} kullanılır`
-                                : draft.retirementAge !== legal
-                                  ? `Yasal sınır ${legal}`
-                                  : undefined
-                            : "Boş bırakılırsa yasal sınır kullanılır"
-                    }
-                />
+                    placeholder={String(legal)}
+                    hint={draft.retirementAge === null ? `Boş bırakılırsa Yargıtay uygulaması ${legal} kullanılır` : undefined}
+                >
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                        <AgeChip active={effectiveAge === 60} onClick={() => set("retirementAge", 60)} label="60" note="Yargıtay" />
+                        {gsAge === 65 && (
+                            <AgeChip active={effectiveAge === 65} onClick={() => set("retirementAge", 65)} label="65" note="Genel Şartlar" />
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => setAgeInfo((o) => !o)}
+                            aria-expanded={ageInfo}
+                            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-muted hover:text-brand transition-colors"
+                        >
+                            <Info className="h-3.5 w-3.5" /> Hangisini seçmeliyim?
+                        </button>
+                    </div>
+                    {ageInfo && (
+                        <div className="mt-2 space-y-1.5 rounded-xl bg-paper p-3 text-xs leading-relaxed text-ink/80 ring-1 ring-line animate-rise">
+                            <p><b>60:</b> Yargıtay'ın yerleşik uygulaması. Kadın ve erkek için aynıdır; mahkeme hesabında bu esas alınır.</p>
+                            <p><b>65:</b> Zorunlu trafik sigortası Genel Şartları'nda (01.04.2020'den itibaren) 01.01.1990 ve sonrası doğanlar için öngörülür. AYM iptal kararı sonrası mahkemeleri bağlamaz; sigorta şirketi hesabını karşılaştırmak için kullanılabilir.</p>
+                            <p><b>Asker, polis vb.:</b> Kurumun yaş haddi (ör. 55–56) erken olsa da Yargıtay aktif dönemi yine 60'a kadar kabul eder. Kanunla daha geç emeklilik yaşı öngörülen durumlarda yaşı elle girin.</p>
+                            <p className="text-muted">Not: Bu araç aktif ve pasif dönemi aynı net asgari ücretle hesapladığından yaş seçimi toplamı değil, aktif/pasif dağılımını değiştirir.</p>
+                        </div>
+                    )}
+                </NumberField>
 
                 <div className="grid grid-cols-2 gap-x-3 gap-y-5">
                     <NumberField label="Geçici iş göremezlik" suffix="ay" value={draft.tempIncapacityMonths} error={errors.tempIncapacityMonths} onChange={(v) => set("tempIncapacityMonths", v)} max={100} />
@@ -342,9 +361,27 @@ function DateField({
     );
 }
 
+function AgeChip({ active, onClick, label, note }: { active: boolean; onClick: () => void; label: string; note: string }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            aria-pressed={active}
+            className={cn(
+                "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ring-1 transition-all",
+                active ? "bg-ink text-white ring-ink" : "bg-white text-ink ring-line hover:ring-brand/50"
+            )}
+        >
+            <span className="num font-semibold">{label}</span>
+            <span className={active ? "text-white/70" : "text-muted"}>{note}</span>
+        </button>
+    );
+}
+
 function NumberField({
-    label, suffix, value, onChange, max, error, placeholder = "", hint,
+    label, suffix, value, onChange, max, error, placeholder = "", hint, children,
 }: {
+    children?: ReactNode;
     label: string;
     suffix: string;
     value: number | null;
@@ -385,6 +422,7 @@ function NumberField({
                 <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-muted">{suffix}</span>
             </div>
             {hint && !error && <p className="mt-1.5 text-xs text-muted">{hint}</p>}
+            {children}
         </Field>
     );
 }

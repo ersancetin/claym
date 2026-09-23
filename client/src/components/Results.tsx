@@ -418,10 +418,11 @@ export function Methodology({ r, inputs }: { r?: CalculationResult; inputs?: Act
                     </Formula>
                     <Formula
                         no={4}
-                        title="Emeklilik yaşı (aktif / pasif dönem sınırı)"
+                        title="Pasif dönem başlangıç yaşı (aktif / pasif dönem sınırı)"
                         example={inputs && <>Bu dosyada emeklilik yaşı <b className="text-ink">{inputs.retirementAge}</b>; pasif dönem {r && d(r.retirementDate)} tarihinde başlar.</>}
                     >
-                        kaza ≥ 20.03.2020 ve doğum ≥ 01.01.1990 ise 65, aksi hâlde 60
+                        Yargıtay: kadın ve erkek için 60
+                        <span className="block text-sm text-muted mt-1">Genel Şartlar (01.04.2020 sonrası): 01.01.1990 ve sonrası doğanlar için 65; mahkemeyi bağlamaz</span>
                     </Formula>
                     <Formula
                         no={5}

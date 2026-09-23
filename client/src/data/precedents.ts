@@ -56,6 +56,6 @@ export const PRECEDENTS: Precedent[] = [
         esas: "2025/3183",
         karar: "2025/7041",
         text: "...Somut olayda, pasif dönem başlangıcı olarak 65 yaş esas alınmış buna göre hesaplama yapılmıştır. Ayrıca söz konusu 65 yaş sınırı 20.03.2020 tarihli Resmi Gazete'de... olay tarihinde yürürlükte de değildir. Bu nedenle pasif dönemin 60 yaşında başlayacağı gözetilerek...",
-        systemNote: "Parametre panelindeki emeklilik yaşı önerisi, kaza ve doğum tarihine göre bu içtihat esas alınarak gösterilir.",
+        systemNote: "Pasif dönem varsayılan olarak 60 yaşında başlar; Genel Şartlar'daki 65 yaş yalnızca kullanıcı seçerse uygulanır.",
     },
 ];

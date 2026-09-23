@@ -114,18 +114,22 @@ export class ActuarialEngine {
         return ageAtAccident < 18;
     }
 
-    static getLegalRetirementAge(birthDate: Date, accidentDate: Date): number {
-        const regulationDate = new Date(2020, 2, 20);
-        const cutoffBirthDate = new Date(1990, 0, 1);
-
-        if (accidentDate >= regulationDate) {
-            if (birthDate >= cutoffBirthDate) {
-                return 65;
-            } else {
-                return 60;
-            }
-        }
+    /**
+     * Pasif dönem başlangıç yaşı, Yargıtay uygulaması: kadın-erkek ayrımı olmaksızın 60.
+     * (ör. 4. HD 2021/25266 E. 2023/3355 K.; 4. HD 2025/1967 E. 2025/12362 K.; 17. HD 2015/2076 E. 2017/8171 K.)
+     * Asker/polis gibi kurum yaş haddi daha erken olan mesleklerde de 60 esas alınır.
+     */
+    static getLegalRetirementAge(_birthDate?: Date, _accidentDate?: Date): number {
         return 60;
+    }
+
+    /**
+     * Zorunlu trafik sigortası Genel Şartları (RG 20.03.2020, yürürlük 01.04.2020):
+     * 01.01.1990 ve sonrası doğanlar için 65, öncekiler için 60. AYM 2019/40 E. 2020/40 K. iptal
+     * kararından sonra mahkemeleri bağlamaz; sigorta şirketi hesabını karşılaştırmak için sunulur.
+     */
+    static getGeneralConditionsRetirementAge(birthDate: Date, accidentDate: Date): number {
+        return accidentDate >= new Date(2020, 3, 1) && birthDate >= new Date(1990, 0, 1) ? 65 : 60;
     }
 
     static interpolateLifeExpectancy(age: number, gender: "M" | "F"): number {
