@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { LogOut, Printer, Sparkles } from "lucide-react";
+import { Download, Loader2, LogOut, ShieldAlert, Sparkles } from "lucide-react";
 import {
     EMPTY_DRAFT, ParameterPanel, legalRetirementAge,
     type ActuarialInputs, type Draft, type DraftErrors,
@@ -10,6 +10,7 @@ import { prefersReducedMotion } from "@/lib/motion";
 import { cn, d, tl } from "@/lib/utils";
 import { Logo } from "@/components/Logo";
 import { signOut } from "@/components/PasswordGate";
+import { DISCLAIMER_FULL, DISCLAIMER_SHORT } from "@/data/methodology";
 
 const TABS = [
     { id: "tables", label: "Hesap tabloları", short: "Tablolar" },
@@ -63,6 +64,7 @@ export default function App() {
     const [busy, setBusy] = useState(false);
     const [calc, setCalc] = useState<Calculated | null>(null);
     const [tab, setTab] = useState<TabId>("tables");
+    const [pdfBusy, setPdfBusy] = useState(false);
     const resultsRef = useRef<HTMLDivElement>(null);
     const timer = useRef<number | undefined>(undefined);
 
@@ -99,6 +101,21 @@ export default function App() {
                 );
             }
         }, prefersReducedMotion() ? 0 : 650);
+    };
+
+    const downloadPdf = async () => {
+        if (!calc || pdfBusy) return;
+        setPdfBusy(true);
+        try {
+            // PDF motoru yalnızca ihtiyaç olduğunda yüklenir
+            const { downloadReport } = await import("@/lib/pdf-report");
+            downloadReport(calc.inputs, calc.result);
+        } catch (err) {
+            console.error(err);
+            alert("PDF oluşturulamadı. Lütfen tekrar deneyin.");
+        } finally {
+            setPdfBusy(false);
+        }
     };
 
     const reset = () => {
@@ -142,6 +159,10 @@ export default function App() {
                     <p className="mt-4 text-white/70 max-w-[60ch] text-[15px] sm:text-base leading-relaxed animate-rise [animation-delay:160ms]">
                         TRH-2010 yaşam tablosu ve dönemsel asgari ücretlerle; bilinen ve bilinmeyen, aktif ve pasif dönem ayrımıyla.
                     </p>
+                    <p className="mt-5 flex max-w-[64ch] items-start gap-2 rounded-xl bg-amber-400/10 px-3.5 py-2.5 text-[13px] leading-snug text-amber-100 ring-1 ring-amber-300/25 animate-rise [animation-delay:240ms]">
+                        <ShieldAlert className="mt-px h-4 w-4 shrink-0 text-amber-300" />
+                        <span><span className="font-semibold text-amber-50">Sorumluluk reddi:</span> {DISCLAIMER_SHORT}</span>
+                    </p>
                 </div>
             </header>
 
@@ -179,10 +200,13 @@ export default function App() {
                                     )}
                                     <button
                                         type="button"
-                                        onClick={() => window.print()}
-                                        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-medium shadow-sm hover:border-brand/40 hover:text-brand transition-colors"
+                                        onClick={downloadPdf}
+                                        disabled={pdfBusy || stale}
+                                        title={stale ? "Önce yeniden hesaplayın" : undefined}
+                                        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-ink-2 hover:-translate-y-px disabled:opacity-50 disabled:hover:translate-y-0"
                                     >
-                                        <Printer className="h-4 w-4" /> Yazdır / PDF
+                                        {pdfBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                                        {pdfBusy ? "PDF hazırlanıyor" : "PDF rapor indir"}
                                     </button>
                                 </div>
 
@@ -235,7 +259,7 @@ export default function App() {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 text-[13px] text-muted print:px-0 print:py-0 print:text-[11px]">
                     <div className="max-w-[90ch] space-y-2">
                         <p>
-                            Bu araç hukuki danışmanlık veya aktüerya hizmeti değildir. Hesaplamalar bilgilendirme amaçlıdır ve bilirkişi raporu yerine geçmez. Tüm hesaplama tarayıcınızda yapılır; girdiğiniz bilgiler hiçbir sunucuya gönderilmez.
+                            <span className="font-semibold text-ink">Sorumluluk reddi.</span> {DISCLAIMER_FULL} Tüm hesaplama tarayıcınızda yapılır; girdiğiniz bilgiler hiçbir sunucuya gönderilmez.
                         </p>
                         <p>© {new Date().getFullYear()} ClaymHero</p>
                     </div>

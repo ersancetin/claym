@@ -35,7 +35,7 @@ export interface Draft {
 export type DraftErrors = Partial<Record<keyof Draft, string>>;
 
 export const EMPTY_DRAFT: Draft = {
-    gender: null,
+    gender: "M",
     birthDate: null,
     accidentDate: null,
     calcDate: null,
@@ -211,6 +211,36 @@ function parseTypedDate(raw: string): Date | null {
     return isValid(p) && p.getFullYear() > 1900 ? p : null;
 }
 
+/**
+ * Yazarken gg.aa.yyyy biçimine çevirir: rakamlar gün, ay ve yıl olarak gruplanır, noktalar
+ * kendiliğinden eklenir. Tek haneli gün/ay ardından ayraç yazılırsa başına 0 konur (1.3 → 01.03).
+ * Silerken sona otomatik nokta eklenmez, böylece geri tuşu takılmaz.
+ */
+export function maskDate(raw: string, deleting = false): string {
+    const segs: string[] = [];
+    let cur = "";
+    for (const ch of raw) {
+        if (/\d/.test(ch)) {
+            if (segs.length < 2) {
+                cur += ch;
+                if (cur.length === 2) {
+                    segs.push(cur);
+                    cur = "";
+                }
+            } else if (cur.length < 4) {
+                cur += ch;
+            }
+        } else if (/[.,/\-\s]/.test(ch) && cur.length === 1 && segs.length < 2) {
+            segs.push(cur.padStart(2, "0"));
+            cur = "";
+        }
+    }
+    let out = segs.join(".");
+    if (segs.length && (cur || (segs.length < 3 && !deleting))) out += ".";
+    out += cur;
+    return out;
+}
+
 function DateField({
     label, value, onChange, fromYear, toYear, action, error,
 }: {
@@ -263,10 +293,13 @@ function DateField({
                     placeholder="gg.aa.yyyy"
                     autoComplete="off"
                     aria-invalid={!!(formatError ?? error)}
+                    maxLength={10}
                     onChange={(e) => {
-                        setText(e.target.value);
+                        const deleting = (e.nativeEvent as InputEvent).inputType?.startsWith("delete") ?? false;
+                        const masked = maskDate(e.target.value, deleting);
+                        setText(masked);
                         // Yazılan tarih anında işlenir; alandan çıkmak gerekmez
-                        onChange(parseTypedDate(e.target.value));
+                        onChange(parseTypedDate(masked));
                     }}
                     onBlur={() => setTouched(true)}
                     className={cn(inputClass, "pr-11", (formatError ?? error) && "border-red-400 focus:border-red-500 focus:ring-red-500/10")}

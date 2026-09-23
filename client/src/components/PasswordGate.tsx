@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { ArrowRight, Lock } from "lucide-react";
+import { ArrowRight, Lock, ShieldAlert } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { DISCLAIMER_SHORT } from "@/data/methodology";
 import { cn } from "@/lib/utils";
 
 // Şifrenin SHA-256 özeti; şifrenin kendisi kaynakta yer almaz.
@@ -36,8 +37,9 @@ export function PasswordGate({ children }: { children: ReactNode }) {
     const [shake, setShake] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    // Dokunmatik cihazda otomatik odak klavyeyi açıp ekranı kaydırır; yalnızca fare/klavye ile odaklan
     useEffect(() => {
-        if (!authed) inputRef.current?.focus();
+        if (!authed && window.matchMedia?.("(pointer: fine)").matches) inputRef.current?.focus({ preventScroll: true });
     }, [authed]);
 
     if (authed) return <>{children}</>;
@@ -60,46 +62,60 @@ export function PasswordGate({ children }: { children: ReactNode }) {
     };
 
     return (
-        <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ink px-4">
-            <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="fixed inset-0 overflow-y-auto bg-ink">
+            <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
                 <div className="absolute -top-40 -right-24 h-[30rem] w-[30rem] rounded-full bg-brand/40 blur-3xl animate-float" />
                 <div className="absolute -bottom-40 -left-24 h-[26rem] w-[26rem] rounded-full bg-sky-400/15 blur-3xl animate-float [animation-delay:-7s]" />
             </div>
-            <form
-                key={shake}
-                onSubmit={submit}
-                className={cn("relative w-full max-w-sm rounded-3xl bg-white p-8 shadow-2xl animate-rise", shake > 0 && "animate-shake")}
-            >
-                <Logo className="justify-center" />
-                <div className="mx-auto mt-7 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand">
-                    <Lock className="h-5 w-5" />
-                </div>
-                <p className="mt-3 text-center text-sm text-muted">Devam etmek için şifreyi girin</p>
-                <input
-                    ref={inputRef}
-                    type="password"
-                    inputMode="numeric"
-                    autoComplete="current-password"
-                    aria-label="Şifre"
-                    aria-invalid={error}
-                    value={value}
-                    onChange={(e) => {
-                        setValue(e.target.value);
-                        setError(false);
-                    }}
-                    className={cn(
-                        "num mt-4 w-full rounded-xl border bg-paper/70 px-4 py-3 text-center text-lg tracking-[0.5em] transition-all focus:outline-none focus:bg-white focus:ring-4",
-                        error ? "border-red-400 focus:ring-red-500/10" : "border-line focus:border-brand focus:ring-brand/10"
-                    )}
-                />
-                <p className={cn("mt-2 h-5 text-center text-sm text-red-600", !error && "invisible")}>Şifre hatalı.</p>
-                <button
-                    type="submit"
-                    className="group mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-[#3b6ff0] py-3 font-semibold text-white shadow-[0_10px_30px_-10px_rgba(34,87,214,0.7)] transition-all hover:-translate-y-px"
+            <div className="relative flex min-h-full flex-col items-center justify-center px-4 py-10">
+                <form
+                    key={shake}
+                    onSubmit={submit}
+                    className={cn("w-full max-w-sm rounded-3xl bg-white px-7 py-9 text-center shadow-2xl", shake > 0 ? "animate-shake" : "animate-rise")}
                 >
-                    Giriş <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </button>
-            </form>
+                    <div className="flex flex-col items-center">
+                        <Logo iconOnly className="justify-center [&_svg]:h-14 [&_svg]:w-14" />
+                        <p className="mt-3 font-serif text-2xl font-bold tracking-tight text-ink leading-none">
+                            Claym<span className="text-brand">Hero</span>
+                        </p>
+                        <p className="mt-1.5 text-[13px] text-muted">Sürekli maluliyet tazminatı hesabı</p>
+                    </div>
+
+                    <div className="my-7 h-px bg-line" />
+
+                    <label htmlFor="gate-password" className="flex items-center justify-center gap-1.5 text-sm font-medium text-ink/80">
+                        <Lock className="h-4 w-4 text-brand" /> Devam etmek için şifreyi girin
+                    </label>
+                    <input
+                        id="gate-password"
+                        ref={inputRef}
+                        type="password"
+                        inputMode="numeric"
+                        autoComplete="current-password"
+                        aria-invalid={error}
+                        value={value}
+                        onChange={(e) => {
+                            setValue(e.target.value);
+                            setError(false);
+                        }}
+                        className={cn(
+                            "num mt-3 w-full rounded-xl border bg-paper/70 px-4 py-3 text-center text-lg tracking-[0.5em] transition-all focus:outline-none focus:bg-white focus:ring-4",
+                            error ? "border-red-400 focus:ring-red-500/10" : "border-line focus:border-brand focus:ring-brand/10"
+                        )}
+                    />
+                    <p className={cn("mt-2 h-5 text-sm text-red-600", !error && "invisible")}>Şifre hatalı.</p>
+                    <button
+                        type="submit"
+                        className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-[#3b6ff0] py-3 font-semibold text-white shadow-[0_10px_30px_-10px_rgba(34,87,214,0.7)] transition-all hover:-translate-y-px"
+                    >
+                        Giriş <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </button>
+                </form>
+                <p className="mt-6 flex max-w-sm items-start gap-2 text-left text-xs leading-snug text-white/55">
+                    <ShieldAlert className="mt-px h-3.5 w-3.5 shrink-0 text-amber-300/80" />
+                    {DISCLAIMER_SHORT}
+                </p>
+            </div>
         </div>
     );
 }

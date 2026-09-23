@@ -5,6 +5,7 @@ import type { ActuarialInputs } from "@/components/ParameterPanel";
 import { TRH2010 } from "@/data/trh2010";
 import { MIN_WAGES, LATEST_MIN_WAGE } from "@/data/min-wages";
 import { PRECEDENTS } from "@/data/precedents";
+import { METHOD_NOTES } from "@/data/methodology";
 import { useCountUp, useMounted } from "@/lib/motion";
 import { cn, d, tl, years } from "@/lib/utils";
 
@@ -16,7 +17,7 @@ export function EmptyState({ busy }: { busy: boolean }) {
     const steps = [
         { icon: FileText, title: "Bilgileri girin", text: "Cinsiyet, tarihler ve oranlar." },
         { icon: Calculator, title: "Hesapla'ya basın", text: "Tüm kalemler tek seferde hesaplanır." },
-        { icon: CalendarRange, title: "Sonucu inceleyin", text: "Dönem analizi, tablolar, yazdırma." },
+        { icon: CalendarRange, title: "Sonucu inceleyin", text: "Dönem analizi, tablolar, PDF rapor." },
     ];
     return (
         <section className={cn(card, "relative overflow-hidden p-6 sm:p-10 animate-rise [animation-delay:280ms]")}>
@@ -474,14 +475,7 @@ export function Methodology({ r, inputs }: { r?: CalculationResult; inputs?: Act
             <section className={cn(card, "print-avoid p-5 sm:p-7")}>
                 <h3 className="font-serif text-lg font-semibold">Hesaplama esasları</h3>
                 <ul className="mt-3 list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-ink/85 max-w-[80ch] marker:text-brand">
-                    <li>Bakiye ömür, TRH-2010 yaşam tablosundan kaza tarihindeki tam yaşa göre doğrusal enterpolasyonla bulunur.</li>
-                    <li>Geçici iş göremezlik, her ay için bir aylık net asgari ücret ve %100 gelir kaybı esasıyla hesaplanır. Kaza tarihinde 18 yaşından küçük ve çalışmayan kişide bu kalem uyarıyla birlikte hesaplanır ve toplama dahil edilir.</li>
-                    <li>Kişinin 18 yaşından küçük olduğu günler için AGİ hariç net asgari ücret esas alınır (Yargıtay 4. HD 2022/16716 E.). Dönem 18. yaş gününe denk gelirse ikiye bölünür. 2022'den itibaren AGİ uygulanmadığından fark yalnızca 2012 ile 2021 arasındaki dönemlerde doğar.</li>
-                    <li>Geçici bakıcı gideri, her ay için bir aylık brüt asgari ücret üzerinden hesaplanır.</li>
-                    <li>Bilinen dönemde her dönemin kendi net asgari ücreti kullanılır. Hesap tarihi bilinen döneme dahildir; bilinmeyen dönem ertesi gün başlar ve hesap tarihinde yürürlükteki net asgari ücretle sabit projeksiyonla hesaplanır.</li>
-                    <li>Henüz açıklanmamış yıllara düşen günler en güncel asgari ücretle hesaplanır ve tablolarda "Güncel ücretle" olarak işaretlenir.</li>
-                    <li>Pasif dönem geliri de asgari ücret üzerinden hesaplanır.</li>
-                    <li>Geçici iş göremezlik süresi, sürekli iş göremezlik bilinen döneminden düşülür.</li>
+                    {METHOD_NOTES.map((n) => <li key={n}>{n}</li>)}
                 </ul>
             </section>
 
