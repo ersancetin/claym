@@ -51,11 +51,4 @@ export const PRECEDENTS: Precedent[] = [
         text: "...Somut dosyada mükerrer olacak şekilde 270 günlük geçici iş göremezlik süresi de bilinen dönem içine dahil edilerek hesaplanmış olup... geçici iş göremezlik süresi hesaplamadan dışlanmak suretiyle bilinen dönem süresi belirlenip sonucuna göre karar verilmesi gerekirken...",
         systemNote: "Geçici iş göremezlik süresi, mükerrerliği önlemek için sürekli iş göremezlik hesabından otomatik olarak çıkarılır.",
     },
-    {
-        division: "4. Hukuk Dairesi",
-        esas: "2025/3183",
-        karar: "2025/7041",
-        text: "...Somut olayda, pasif dönem başlangıcı olarak 65 yaş esas alınmış buna göre hesaplama yapılmıştır. Ayrıca söz konusu 65 yaş sınırı 20.03.2020 tarihli Resmi Gazete'de... olay tarihinde yürürlükte de değildir. Bu nedenle pasif dönemin 60 yaşında başlayacağı gözetilerek...",
-        systemNote: "Emeklilik yaşı alanı varsayılan olarak 60 gelir; kullanıcı dosyaya göre farklı bir yaş girebilir.",
-    },
 ];
