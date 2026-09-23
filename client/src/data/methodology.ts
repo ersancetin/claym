@@ -6,7 +6,7 @@ export const METHOD_NOTES: string[] = [
     "Geçici bakıcı gideri, her ay için bir aylık brüt asgari ücret üzerinden hesaplanır.",
     "Bilinen dönemde her dönemin kendi net asgari ücreti kullanılır. Hesap tarihi bilinen döneme dahildir; bilinmeyen dönem ertesi gün başlar ve hesap tarihinde yürürlükteki net asgari ücretle sabit projeksiyonla hesaplanır.",
     "Henüz açıklanmamış yıllara düşen günler en güncel asgari ücretle hesaplanır ve tablolarda \"Güncel ücretle\" olarak işaretlenir.",
-    "Aktif dönem 18 yaşında başlar. Pasif dönem, Yargıtay uygulamasına uygun olarak kadın ve erkek için 60 yaşında başlar; asker ve polis gibi kurum yaş haddi daha erken olan mesleklerde de 60 esas alınır. Genel Şartlar'daki 65 yaş (01.01.1990 ve sonrası doğanlar) mahkemeyi bağlamaz; yalnızca kullanıcı seçerse uygulanır.",
+    "Aktif dönem 18 yaşında başlar ve emeklilik yaşında sona erer; sonrası pasif dönemdir. Emeklilik yaşı varsayılan olarak 60 alınır, dosyanın durumuna göre değiştirilebilir.",
     "Pasif dönem geliri de asgari ücret üzerinden hesaplanır.",
     "Geçici iş göremezlik süresi, sürekli iş göremezlik bilinen döneminden düşülür.",
 ];

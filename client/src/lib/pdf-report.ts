@@ -437,13 +437,8 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult): TDoc
             "Pasif dönem başlangıç yaşı (aktif / pasif dönem sınırı)",
             {
                 stack: [
-                    { text: "Yargıtay: kadın ve erkek için 60" },
-                    {
-                        text: "Genel Şartlar (01.04.2020 sonrası): 01.01.1990 ve sonrası doğanlar için 65; AYM 2019/40 E. 2020/40 K. sonrası mahkemeyi bağlamaz",
-                        fontSize: 8.5,
-                        color: C.muted,
-                        margin: [0, 3, 0, 0],
-                    },
+                    { text: "aktif dönem: 18 yaş – emeklilik yaşı  ·  pasif dönem: emeklilik yaşı – ömür sonu" },
+                    { text: "Varsayılan emeklilik yaşı 60'tır; dosyaya göre değiştirilebilir", fontSize: 8.5, color: C.muted, margin: [0, 3, 0, 0] },
                 ],
             },
             { text: ["Bu dosyada emeklilik yaşı ", { text: String(inputs.retirementAge), bold: true, color: C.ink }, `; pasif dönem ${d(r.retirementDate)} tarihinde başlar.`] }

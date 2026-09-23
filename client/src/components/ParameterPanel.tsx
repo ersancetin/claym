@@ -3,7 +3,7 @@ import * as Popover from "@radix-ui/react-popover";
 import { DayPicker } from "react-day-picker";
 import { tr } from "date-fns/locale";
 import { isValid, parse } from "date-fns";
-import { Calculator, CalendarDays, Info, Loader2, RotateCcw } from "lucide-react";
+import { Calculator, CalendarDays, CircleHelp, Loader2, RotateCcw } from "lucide-react";
 import { cn, d } from "@/lib/utils";
 import { ActuarialEngine } from "@/lib/actuarial-engine";
 
@@ -39,18 +39,15 @@ export const EMPTY_DRAFT: Draft = {
     birthDate: null,
     accidentDate: null,
     calcDate: null,
-    retirementAge: null,
+    retirementAge: 60,
     tempIncapacityMonths: null,
     tempCaretakerMonths: null,
     disabilityRate: null,
     faultRate: null,
 };
 
-/** Boş bırakılan emeklilik yaşı için Yargıtay uygulaması: herkes için 60 */
+/** Emeklilik yaşı alanı boş bırakılırsa kullanılan varsayılan değer */
 export const legalRetirementAge = (_draft?: Draft) => ActuarialEngine.getLegalRetirementAge();
-
-const generalConditionsAge = (draft: Draft) =>
-    draft.birthDate && draft.accidentDate ? ActuarialEngine.getGeneralConditionsRetirementAge(draft.birthDate, draft.accidentDate) : null;
 
 interface Props {
     draft: Draft;
@@ -66,8 +63,6 @@ interface Props {
 export function ParameterPanel({ draft, errors, busy, stale, hasResult, onChange, onSubmit, onReset }: Props) {
     const set = <K extends keyof Draft>(key: K, value: Draft[K]) => onChange({ ...draft, [key]: value });
     const legal = legalRetirementAge(draft);
-    const gsAge = generalConditionsAge(draft);
-    const effectiveAge = draft.retirementAge ?? legal;
     const [ageInfo, setAgeInfo] = useState(false);
     const thisYear = new Date().getFullYear();
 
@@ -138,28 +133,26 @@ export function ParameterPanel({ draft, errors, busy, stale, hasResult, onChange
                     onChange={(v) => set("retirementAge", v)}
                     max={80}
                     placeholder={String(legal)}
-                    hint={draft.retirementAge === null ? `Boş bırakılırsa Yargıtay uygulaması ${legal} kullanılır` : undefined}
-                >
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                        <AgeChip active={effectiveAge === 60} onClick={() => set("retirementAge", 60)} label="60" note="Yargıtay" />
-                        {gsAge === 65 && (
-                            <AgeChip active={effectiveAge === 65} onClick={() => set("retirementAge", 65)} label="65" note="Genel Şartlar" />
-                        )}
+                    action={
                         <button
                             type="button"
                             onClick={() => setAgeInfo((o) => !o)}
                             aria-expanded={ageInfo}
-                            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-muted hover:text-brand transition-colors"
+                            aria-label="Emeklilik yaşı hakkında bilgi"
+                            title="Emeklilik yaşı hakkında bilgi"
+                            className={cn("rounded-full p-0.5 transition-colors", ageInfo ? "text-brand" : "text-muted hover:text-brand")}
                         >
-                            <Info className="h-3.5 w-3.5" /> Hangisini seçmeliyim?
+                            <CircleHelp className="h-4 w-4" />
                         </button>
-                    </div>
+                    }
+                >
                     {ageInfo && (
                         <div className="mt-2 space-y-1.5 rounded-xl bg-paper p-3 text-xs leading-relaxed text-ink/80 ring-1 ring-line animate-rise">
-                            <p><b>60:</b> Yargıtay'ın yerleşik uygulaması. Kadın ve erkek için aynıdır; mahkeme hesabında bu esas alınır.</p>
-                            <p><b>65:</b> Zorunlu trafik sigortası Genel Şartları'nda (01.04.2020'den itibaren) 01.01.1990 ve sonrası doğanlar için öngörülür. AYM iptal kararı sonrası mahkemeleri bağlamaz; sigorta şirketi hesabını karşılaştırmak için kullanılabilir.</p>
-                            <p><b>Asker, polis vb.:</b> Kurumun yaş haddi (ör. 55–56) erken olsa da Yargıtay aktif dönemi yine 60'a kadar kabul eder. Kanunla daha geç emeklilik yaşı öngörülen durumlarda yaşı elle girin.</p>
-                            <p className="text-muted">Not: Bu araç aktif ve pasif dönemi aynı net asgari ücretle hesapladığından yaş seçimi toplamı değil, aktif/pasif dağılımını değiştirir.</p>
+                            <p>Varsayılan değer 60'tır; dosyanın durumuna göre değiştirilebilir.</p>
+                            <p>Yargıtay kararlarında pasif dönemin genellikle 60 yaşında başlatıldığı görülmektedir; kadın ve erkek için ayrı bir yaş uygulanmamaktadır.</p>
+                            <p>Zorunlu trafik sigortası Genel Şartları'nda 01.01.1990 ve sonrası doğanlar için 65 yaş öngörülmektedir; bu düzenlemenin mahkeme hesaplarına etkisi tartışmalıdır.</p>
+                            <p>Asker, polis gibi kurum yaş haddi daha erken olan mesleklerde de uygulamada çoğunlukla 60 esas alınmaktadır; somut duruma göre farklı bir yaş girilebilir.</p>
+                            <p className="text-muted">Bu araçta aktif ve pasif dönem aynı net asgari ücretle hesaplandığından, yaş değişikliği toplamı değil aktif/pasif dağılımını etkiler.</p>
                         </div>
                     )}
                 </NumberField>
@@ -361,27 +354,11 @@ function DateField({
     );
 }
 
-function AgeChip({ active, onClick, label, note }: { active: boolean; onClick: () => void; label: string; note: string }) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            aria-pressed={active}
-            className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium ring-1 transition-all",
-                active ? "bg-ink text-white ring-ink" : "bg-white text-ink ring-line hover:ring-brand/50"
-            )}
-        >
-            <span className="num font-semibold">{label}</span>
-            <span className={active ? "text-white/70" : "text-muted"}>{note}</span>
-        </button>
-    );
-}
-
 function NumberField({
-    label, suffix, value, onChange, max, error, placeholder = "", hint, children,
+    label, suffix, value, onChange, max, error, placeholder = "", hint, children, action,
 }: {
     children?: ReactNode;
+    action?: ReactNode;
     label: string;
     suffix: string;
     value: number | null;
@@ -402,7 +379,7 @@ function NumberField({
     }, [value]);
 
     return (
-        <Field label={label} htmlFor={id} error={error}>
+        <Field label={label} htmlFor={id} error={error} action={action}>
             <div className="relative">
                 <input
                     id={id}
