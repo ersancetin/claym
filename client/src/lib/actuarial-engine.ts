@@ -1,6 +1,6 @@
 import { TRH2010 } from "../data/trh2010";
 import { MIN_WAGES } from "../data/min-wages";
-import { addMonths, addDays } from "date-fns";
+import { addMonths, addDays, differenceInCalendarDays, getDaysInMonth } from "date-fns";
 
 /**
  * "YYYY-MM-DD" metnini YEREL gece yarısı olarak çözer.
@@ -46,6 +46,7 @@ export interface CompensationRow {
 }
 
 export interface CalculationResult {
+    /** Kaza tarihindeki tam yaş (bakiye ömür bu yaşa göre bulunur) */
     exactAge: number;
     lifeExpectancy: number;
     deathAge: number;
@@ -176,73 +177,70 @@ export class ActuarialEngine {
         return totalDays - leapDays;
     }
 
-    static calculateTempCompensationByMonths(accidentDate: Date, months: number, faultRate: number, useGrossWage: boolean, date18?: Date): { rows: CompensationRow[], total: number } {
-        if (months <= 0) return { rows: [], total: 0 };
+    /**
+     * Ay esaslı geçici dönem hesabı (geçici iş göremezlik ve bakıcı gideri).
+     * Her ay bir aylık ücret sayılır. Kaza günü hariç tutulur: kaza ayında kalan gün sayısı
+     * (ayın gün sayısı − kaza günü) 30'a bölünerek ay kesrine çevrilir, sonraki aylar tam sayılır.
+     * Dönen `end`, geçici dönemin son günüdür; sürekli dönem ertesi gün başlar.
+     */
+    static calculateTempCompensationByMonths(accidentDate: Date, months: number, faultRate: number, useGrossWage: boolean, date18?: Date): { rows: CompensationRow[], total: number, end: Date } {
+        if (months <= 0) return { rows: [], total: 0, end: addDays(accidentDate, -1) };
 
         let totalCompensation = 0;
         const rows: CompensationRow[] = [];
-        let remainingMonths = months;
-        let currentDate = new Date(accidentDate);
+        let remaining = months;
+        let segStart = new Date(accidentDate);
+        let first = true;
+        let lastEnd = new Date(accidentDate);
 
-        while (remainingMonths > 0) {
-            const applicableWage = WAGES.find(wage => currentDate >= wage.startDate && currentDate <= wage.endDate);
+        while (remaining > 1e-9) {
+            const w = wageAt(segStart);
+            const wageEnd = w.endDate;
+            const monthSpan = (wageEnd.getFullYear() - segStart.getFullYear()) * 12 + wageEnd.getMonth() - segStart.getMonth();
+            // Ücret dönemine düşen ay sayısı; dönemler ay sonunda biter
+            const available = first
+                ? monthSpan + (getDaysInMonth(segStart) - segStart.getDate()) / 30
+                : monthSpan + 1;
+            const taken = Math.min(remaining, available);
 
-            if (!applicableWage) break;
-
-            const wageEnd = applicableWage.endDate;
-            const minorPeriod = !useGrossWage && !!date18 && currentDate < date18;
-            const wageAmount = useGrossWage ? applicableWage.gross : netWage(applicableWage, minorPeriod);
-            const agiExcluded = minorPeriod && applicableWage.amountWithoutAgi !== applicableWage.amount;
-
-            const periodStart = new Date(currentDate);
-            let monthsInThisPeriod = 0;
-            let tempDate = new Date(currentDate);
-
-            while (remainingMonths > 0 && tempDate <= wageEnd) {
-                const monthToAdd = Math.min(remainingMonths, 1);
-                const nextDate = addMonths(tempDate, monthToAdd);
-                
-                if (nextDate > wageEnd) {
-                    const daysUntilEnd = Math.floor((wageEnd.getTime() - tempDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                    const fractionOfMonth = daysUntilEnd / 30;
-                    monthsInThisPeriod += fractionOfMonth;
-                    remainingMonths -= fractionOfMonth;
-                    tempDate = new Date(wageEnd);
-                    tempDate.setDate(tempDate.getDate() + 1);
-                    break;
-                } else {
-                    monthsInThisPeriod += monthToAdd;
-                    remainingMonths -= monthToAdd;
-                    tempDate = nextDate;
-                }
+            let segEnd: Date;
+            if (taken >= available - 1e-9) {
+                segEnd = new Date(wageEnd);
+            } else {
+                const whole = Math.floor(taken + 1e-9);
+                const extraDays = Math.round((taken - whole) * 30);
+                segEnd = first
+                    ? addDays(addMonths(segStart, whole), extraDays)
+                    : addDays(addMonths(segStart, whole), extraDays - 1);
             }
 
-            if (monthsInThisPeriod > 0) {
-                const periodEnd = addMonths(periodStart, monthsInThisPeriod);
-                const actualEnd = periodEnd > wageEnd ? wageEnd : periodEnd;
-                
-                const loss = monthsInThisPeriod * wageAmount * (faultRate / 100);
-                totalCompensation += loss;
+            const minorPeriod = !useGrossWage && !!date18 && segStart < date18;
+            const wageAmount = useGrossWage ? w.gross : netWage(w, minorPeriod);
+            // Satır tutarı kuruşa yuvarlanır
+            const loss = Math.round((taken * wageAmount * (faultRate / 100) + 1e-7) * 100) / 100;
+            totalCompensation += loss;
 
-                // Show actual calendar days for display
-                const actualDays = Math.floor((actualEnd.getTime() - periodStart.getTime()) / (1000 * 60 * 60 * 24));
-
+            if (taken > 0) {
                 rows.push({
-                    start: periodStart,
-                    end: actualEnd,
-                    days: actualDays,
+                    start: new Date(segStart),
+                    end: segEnd,
+                    // Kaza günü sayılmaz; sonraki dönemlerde başlangıç günü dahildir
+                    days: differenceInCalendarDays(segEnd, segStart) + (first ? 0 : 1),
                     wage: wageAmount,
                     amount: loss,
                     type: useGrossWage ? 'caretaker' : 'temp',
-                    agiExcluded,
-                    projected: periodStart > WAGE_DATA_END
+                    agiExcluded: minorPeriod && w.amountWithoutAgi !== w.amount,
+                    projected: segStart > WAGE_DATA_END
                 });
             }
 
-            currentDate = tempDate;
+            remaining -= taken;
+            lastEnd = segEnd;
+            segStart = addDays(wageEnd, 1);
+            first = false;
         }
 
-        return { rows, total: totalCompensation };
+        return { rows, total: totalCompensation, end: lastEnd };
     }
 
     static calculateCompensation(
@@ -331,7 +329,8 @@ export class ActuarialEngine {
         // Use the retirement age from user input
         const retirementAge = inputs.retirementAge;
         
-        // 1. Ages & Life Expectancy
+        // 1. Yaş ve bakiye ömür: Yargıtay 4. HD 2023/13132 E. ve 2022/16229 E. uyarınca kaza tarihindeki yaşa göre
+        // TRH-2010'dan bulunur, beklenen ömür sonu kaza tarihine eklenerek belirlenir.
         const ageAtAccident = this.calculateExactAge(birthDate, accidentDate);
         const lifeExp = this.interpolateLifeExpectancy(ageAtAccident, gender);
         const deathDate = this.addYearsToDate(accidentDate, lifeExp);
@@ -341,59 +340,15 @@ export class ActuarialEngine {
         const retirementDate = new Date(birthDate);
         retirementDate.setFullYear(retirementDate.getFullYear() + retirementAge);
 
-        // Helper to add months accurately (e.g., 1.5 months = 1 month + 15 days)
-        const addMonthsAndDays = (date: Date, months: number): Date => {
-            const wholeMonths = Math.floor(months);
-            const fraction = months - wholeMonths;
-            const extraDays = Math.round(fraction * 30);
-            
-            let result = addMonths(date, wholeMonths);
-            if (extraDays > 0) {
-                result = addDays(result, extraDays);
-            }
-            return result;
-        };
-
-        // Calculate End Dates
-        // Logic: End Date is INCLUSIVE. 
-        // If duration is 1 month (Jan 1 -> Jan 31), next period starts Feb 1.
-        // addMonths(Jan 1, 1) -> Feb 1.
-        // So inclusive end date = Feb 1 - 1 day = Jan 31.
-        
-        let tempIncapacityEndDate = new Date(accidentDate);
-        if (inputs.tempIncapacityMonths > 0) {
-            const endDateExclusive = addMonthsAndDays(accidentDate, inputs.tempIncapacityMonths);
-            tempIncapacityEndDate = addDays(endDateExclusive, -1);
-        } else {
-            // If 0 months, end date is before start date (invalid range, results in 0 cost)
-            tempIncapacityEndDate = addDays(accidentDate, -1);
-        }
-
-        let tempCaretakerEndDate = new Date(accidentDate);
-        if (tempCaretakerMonths > 0) {
-             const endDateExclusive = addMonthsAndDays(accidentDate, tempCaretakerMonths);
-             tempCaretakerEndDate = addDays(endDateExclusive, -1);
-        } else {
-             tempCaretakerEndDate = addDays(accidentDate, -1);
-        }
-
-        // Permanent Period Start:
-        // "geçici iş göremezlik süresi hesaplamadan dışlanmak suretiyle bilinen dönem süresi belirlenip"
-        // Means Permanent Period starts AFTER Temporary Period.
-        // tempIncapacityEndDate is the last day of temp incapacity.
-        // So Permanent Start is the next day.
-        const permanentStart = new Date(tempIncapacityEndDate);
-        permanentStart.setDate(permanentStart.getDate() + 1);
-
-        // 3. Compensation - Temporary
-        // 1 month = 1 net minimum wage (not daily calculation)
-        // Calculate temp incapacity (shown with strikethrough for minors)
+        // 3. Geçici iş göremezlik: her ay bir aylık net asgari ücret
         const date18Birthday = eighteenthBirthday(birthDate);
         const tempRes = this.calculateTempCompensationByMonths(accidentDate, inputs.tempIncapacityMonths, faultRate, false, date18Birthday);
 
-        // 3.1 Compensation - Temporary Caretaker (Bakıcı Gideri)
-        // 1 month = 1 gross minimum wage (not daily calculation)
+        // 3.1 Geçici bakıcı gideri: her ay bir aylık brüt asgari ücret
         const caretakerRes = this.calculateTempCompensationByMonths(accidentDate, tempCaretakerMonths, faultRate, true);
+
+        // Geçici iş göremezlik süresi bilinen dönemden düşülür; sürekli dönem geçici dönemin ertesi günü başlar
+        const permanentStart = addDays(tempRes.end, 1);
 
         // 4. Compensation - Permanent (Known Period)
         // From permanentStart to min(calcDate, deathDate)

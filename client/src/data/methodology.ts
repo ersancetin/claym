@@ -1,7 +1,7 @@
 /** Hesaplama esasları; hem ekranda hem PDF raporunda kullanılır */
 export const METHOD_NOTES: string[] = [
-    "Bakiye ömür, TRH-2010 yaşam tablosundan kaza tarihindeki tam yaşa göre doğrusal enterpolasyonla bulunur.",
-    "Geçici iş göremezlik, her ay için bir aylık net asgari ücret ve %100 gelir kaybı esasıyla hesaplanır. Kaza tarihinde 18 yaşından küçük ve çalışmayan kişide bu kalem uyarıyla birlikte hesaplanır ve toplama dahil edilir.",
+    "Bakiye ömür, Yargıtay 4. HD 2023/13132 E., 2024/524 K. ve 2022/16229 E., 2024/13018 K. kararları uyarınca TRH-2010 yaşam tablosundan kaza tarihindeki tam yaşa göre doğrusal enterpolasyonla bulunur; beklenen ömür sonu kaza tarihine eklenerek belirlenir.",
+    "Geçici iş göremezlik, her ay için bir aylık net asgari ücret ve %100 gelir kaybı esasıyla hesaplanır. Süre ücret dönemlerine paylaştırılırken kaza günü sayılmaz; kaza ayında kalan günler (ayın gün sayısı − kaza günü) 30'a bölünerek ay kesrine çevrilir. Kaza tarihinde 18 yaşından küçük ve çalışmayan kişide bu kalem uyarıyla birlikte hesaplanır ve toplama dahil edilir.",
     "Kişinin 18 yaşından küçük olduğu günler için AGİ hariç net asgari ücret esas alınır (Yargıtay 4. HD 2022/16716 E.). Dönem 18. yaş gününe denk gelirse ikiye bölünür. 2022'den itibaren AGİ uygulanmadığından fark yalnızca 2012 ile 2021 arasındaki dönemlerde doğar.",
     "Geçici bakıcı gideri, her ay için bir aylık brüt asgari ücret üzerinden hesaplanır.",
     "Bilinen dönemde her dönemin kendi net asgari ücreti kullanılır. Hesap tarihi bilinen döneme dahildir; bilinmeyen dönem ertesi gün başlar ve hesap tarihinde yürürlükteki net asgari ücretle sabit projeksiyonla hesaplanır.",
