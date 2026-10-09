@@ -31,7 +31,7 @@ export const DISCLAIMER_SHORT =
 
 /** Ayrıntılı bilgilendirme; altbilgide ve PDF'in ilk ve son sayfasında paragraflar halinde gösterilir */
 export const DISCLAIMER_PARAGRAPHS: string[] = [
-    "Bu araç, Cumhuriyet Avukatları tarafından meslektaş dayanışması amacıyla hazırlanmış ücretsiz bir eğitim çalışmasıdır. Sürekli ve geçici iş göremezlik tazminatının, Yargıtay kararlarında benimsenen yöntemle nasıl hesaplandığını göstermeyi amaçlar.",
+    "Bu araç, Cumhuriyet Avukatları tarafından meslektaş dayanışması amacıyla hazırlanmış ücretsiz bir eğitim çalışmasıdır. Sürekli iş göremezlik, geçici iş göremezlik ve geçici bakıcı gideri kalemlerinin Yargıtay kararlarında benimsenen yöntemle nasıl hesaplandığını göstermeyi amaçlar.",
     "Elde edilen sonuçlar bilirkişi raporu, uzman görüşü veya hukuki mütalaa niteliği taşımaz ve delil olarak kullanılamaz. Somut bir uyuşmazlıkta tazminat miktarı, mahkemece görevlendirilen bilirkişinin hesabıyla belirlenir.",
     "Hesaplama yalnızca girilen verilere dayanır. Dosyaya özgü koşullar, belgelenen gerçek gelir, mahsup ve indirim sebepleri ile mevzuat ve içtihat değişiklikleri sonucu etkileyebilir. Sonuçlara dayanılarak yapılan işlemlerden Cumhuriyet Avukatları sorumlu tutulamaz.",
     "Girilen bilgiler yalnızca tarayıcınızda işlenir; hiçbir sunucuya gönderilmez ve saklanmaz.",

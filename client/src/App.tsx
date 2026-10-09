@@ -160,8 +160,8 @@ export default function App() {
                         Sürekli maluliyet tazminatı hesaplama
                     </h1>
                     <p className="mt-3 max-w-[64ch] text-[15px] font-light leading-relaxed text-ink/80 animate-rise [animation-delay:160ms]">
-                        Yargıtay kararları doğrultusunda; TRH-2010 yaşam tablosu ve dönemsel asgari ücretlerle bilinen ve bilinmeyen, aktif ve pasif dönem ayrımıyla
-                        hazırlanmış bir eğitim çalışmasıdır. Hesap tamamen tarayıcınızda yapılır, hiçbir veri gönderilmez.
+                        Sürekli iş göremezlik, geçici iş göremezlik ve geçici bakıcı gideri; Yargıtay kararları doğrultusunda, TRH-2010 yaşam tablosu ve dönemsel asgari ücretlerle,
+                        bilinen ve bilinmeyen, aktif ve pasif dönem ayrımı yapılarak hesaplanır. Hesap tamamen tarayıcınızda yapılır, hiçbir veri gönderilmez.
                     </p>
                 </div>
             </section>

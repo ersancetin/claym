@@ -254,7 +254,7 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
                     width: "*",
                     stack: [
                         { text: "Sürekli maluliyet tazminatı hesap çalışması", fontSize: 18, bold: true, margin: [0, 0, 0, 2] },
-                        { text: "Meslektaş dayanışması amacıyla, Yargıtay kararları doğrultusunda TRH-2010 yaşam tablosu ve dönemsel asgari ücretlerle hazırlanmış eğitim çalışması.", fontSize: 9, color: C.muted },
+                        { text: "Sürekli iş göremezlik, geçici iş göremezlik ve geçici bakıcı gideri. Meslektaş dayanışması amacıyla, Yargıtay kararları doğrultusunda TRH-2010 yaşam tablosu ve dönemsel asgari ücretlerle hazırlanmış eğitim çalışması.", fontSize: 9, color: C.muted },
                     ],
                 },
                 { width: 90, stack: [{ text: "Oluşturulma tarihi", fontSize: 8, color: C.muted, alignment: "right" }, { text: today, bold: true, alignment: "right" }], margin: [0, 4, 0, 0] },
