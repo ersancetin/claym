@@ -6,7 +6,7 @@ import { wageAt, type CalculationResult, type CompensationRow } from "@/lib/actu
 import { TRH2010 } from "@/data/trh2010";
 import { MIN_WAGES, LATEST_MIN_WAGE } from "@/data/min-wages";
 import { PRECEDENTS } from "@/data/precedents";
-import { BRAND, DISCLAIMER_LINE, DISCLAIMER_POINTS, DISCLAIMER_SHORT, DISCLAIMER_TITLE, METHOD_NOTES } from "@/data/methodology";
+import { BRAND, DISCLAIMER_LEAD, DISCLAIMER_LINE, DISCLAIMER_PARAGRAPHS, DISCLAIMER_SHORT, DISCLAIMER_TITLE, METHOD_NOTES } from "@/data/methodology";
 import logoUrl from "@/assets/logo.png";
 import { d, tl, years } from "@/lib/utils";
 
@@ -289,8 +289,8 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
                             fillColor: C.brandSoft,
                             margin: [10, 7, 10, 7],
                             stack: [
-                                { text: DISCLAIMER_TITLE.toLocaleUpperCase("tr-TR"), bold: true, fontSize: 8, characterSpacing: 0.6, margin: [0, 0, 0, 4] },
-                                ...DISCLAIMER_POINTS.map((p, i): Content => ({ text: [{ text: `${i + 1}. ${p.title}. `, bold: true }, p.text], margin: [0, 0, 0, 2.5] })),
+                                { text: DISCLAIMER_TITLE, bold: true, fontSize: 8.5, margin: [0, 0, 0, 4] },
+                                ...DISCLAIMER_PARAGRAPHS.map((t): Content => ({ text: t, margin: [0, 0, 0, 3] })),
                             ],
                             fontSize: 7.5,
                             color: C.brandDark,
@@ -597,11 +597,10 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
             stack: [
                 sectionTitle(DISCLAIMER_TITLE),
                 {
-                    ol: DISCLAIMER_POINTS.map((p) => ({ text: [{ text: `${p.title}. `, bold: true, color: C.ink }, p.text], margin: [0, 0, 0, 4] })),
+                    stack: DISCLAIMER_PARAGRAPHS.map((t): Content => ({ text: t, margin: [0, 0, 0, 5] })),
                     fontSize: 9,
                     color: C.muted,
                     lineHeight: 1.3,
-                    markerColor: C.brand,
                 },
             ],
         } as Content,
@@ -632,7 +631,7 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
                 },
                 {
                     margin: [0, 7, 0, 0],
-                    table: { widths: ["*"], body: [[{ text: [{ text: `${DISCLAIMER_TITLE}: `, bold: true }, DISCLAIMER_SHORT], fontSize: 7, color: C.brandDark, fillColor: C.brandSoft, margin: [6, 4, 6, 4], lineHeight: 1.2 }]] },
+                    table: { widths: ["*"], body: [[{ text: [{ text: `${DISCLAIMER_LEAD} `, bold: true }, DISCLAIMER_SHORT], fontSize: 7, color: C.brandDark, fillColor: C.brandSoft, margin: [6, 4, 6, 4], lineHeight: 1.2 }]] },
                     layout: { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: () => C.brand, vLineColor: () => C.brand },
                 },
             ],

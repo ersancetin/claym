@@ -19,36 +19,23 @@ export const BRAND = {
     url: "https://cumhuriyetavukatlari.com",
 } as const;
 
-/** Uyarının başlığı; sitede ve PDF'te kısa ve ayrıntılı metnin önünde yer alır */
-export const DISCLAIMER_TITLE = "Hukuki nitelik bildirimi";
+/** Bilgilendirme başlığı; altbilgide ve PDF'in ilk ve son sayfasında kullanılır */
+export const DISCLAIMER_TITLE = "Bilgilendirme";
 
-/** Kısa uyarı; sitenin üst şeridinde, giriş ekranında ve PDF'in her sayfasının üstünde gösterilir */
+/** Kısa bilgilendirmenin vurgulu ilk cümlesi */
+export const DISCLAIMER_LEAD = "Bu araç bir eğitim çalışmasıdır.";
+
+/** Kısa bilgilendirmenin devamı; sitenin üst şeridinde, giriş ekranında ve PDF'in her sayfasının üstünde gösterilir */
 export const DISCLAIMER_SHORT =
-    "Bu hesap çalışması, Cumhuriyet Avukatları tarafından meslektaş dayanışması kapsamında, Yargıtay kararlarında benimsenen ilkeler esas alınarak hazırlanmış eğitim amaçlı bir modeldir. 6100 sayılı HMK m. 266 vd. uyarınca düzenlenen bilirkişi raporu veya m. 293 kapsamında uzman görüşü niteliği taşımaz; hukuki mütalaa yerine geçmez.";
+    "Cumhuriyet Avukatları tarafından meslektaş dayanışması amacıyla, Yargıtay içtihatları ışığında hazırlanmıştır. Bilirkişi raporu veya uzman görüşü niteliği taşımaz; delil olarak kullanılamaz.";
 
-/** Ayrıntılı uyarı maddeleri; sitenin altbilgisinde ve PDF'in ilk ve son sayfasında gösterilir */
-export const DISCLAIMER_POINTS: { title: string; text: string }[] = [
-    {
-        title: "Niteliği",
-        text: "Bu çalışma, sürekli ve geçici iş göremezlik zararının Yargıtay kararlarında benimsenen yöntemle (TRH-2010 yaşam tablosu, dönemsel net asgari ücret, bilinen ve bilinmeyen dönem ayrımı) nasıl hesaplandığını göstermek amacıyla, Cumhuriyet Avukatları tarafından meslektaş dayanışması kapsamında ücretsiz olarak sunulan eğitim amaçlı bir modeldir.",
-    },
-    {
-        title: "Delil değeri",
-        text: "6100 sayılı Hukuk Muhakemeleri Kanunu m. 266 vd. ve 6754 sayılı Bilirkişilik Kanunu uyarınca düzenlenen bilirkişi raporu, HMK m. 293 kapsamında uzman görüşü veya hukuki mütalaa niteliği taşımaz; yargı mercilerine ya da karşı tarafa delil olarak sunulmak üzere hazırlanmamıştır. Somut uyuşmazlıkta tazminat hesabı, mahkemece görevlendirilen bilirkişi tarafından yapılır.",
-    },
-    {
-        title: "Veri ve varsayımlar",
-        text: "Sonuçlar yalnızca kullanıcının girdiği verilere dayanır; maluliyet ve kusur oranları ile gelir bilgisi doğrulanmaz. Belgelendirilen gerçek gelir, Sosyal Güvenlik Kurumunca bağlanan gelirin mahsubu, müterafik kusur, hatır taşıması gibi indirim sebepleri ile mevzuat ve içtihat değişiklikleri sonucu değiştirebilir.",
-    },
-    {
-        title: "Sorumluluk",
-        text: "Bu çalışmaya dayanılarak yapılan işlem, verilen karar veya yapılan başvurulardan Cumhuriyet Avukatları sorumlu tutulamaz.",
-    },
-    {
-        title: "Kişisel veriler",
-        text: "Hesaplama tamamen kullanıcının tarayıcısında yapılır; girilen bilgiler herhangi bir sunucuya iletilmez ve saklanmaz.",
-    },
+/** Ayrıntılı bilgilendirme; altbilgide ve PDF'in ilk ve son sayfasında paragraflar halinde gösterilir */
+export const DISCLAIMER_PARAGRAPHS: string[] = [
+    "Bu araç, Cumhuriyet Avukatları tarafından meslektaş dayanışması amacıyla hazırlanmış ücretsiz bir eğitim çalışmasıdır. Sürekli ve geçici iş göremezlik tazminatının, Yargıtay kararlarında benimsenen yöntemle nasıl hesaplandığını göstermeyi amaçlar.",
+    "Elde edilen sonuçlar bilirkişi raporu, uzman görüşü veya hukuki mütalaa niteliği taşımaz ve delil olarak kullanılamaz. Somut bir uyuşmazlıkta tazminat miktarı, mahkemece görevlendirilen bilirkişinin hesabıyla belirlenir.",
+    "Hesaplama yalnızca girilen verilere dayanır. Dosyaya özgü koşullar, belgelenen gerçek gelir, mahsup ve indirim sebepleri ile mevzuat ve içtihat değişiklikleri sonucu etkileyebilir. Sonuçlara dayanılarak yapılan işlemlerden Cumhuriyet Avukatları sorumlu tutulamaz.",
+    "Girilen bilgiler yalnızca tarayıcınızda işlenir; hiçbir sunucuya gönderilmez ve saklanmaz.",
 ];
 
 /** Altbilgi ve PDF alt satırında kullanılan tek cümlelik hatırlatma */
-export const DISCLAIMER_LINE = "Eğitim amaçlı modeldir; bilirkişi raporu, uzman görüşü veya hukuki mütalaa yerine geçmez.";
+export const DISCLAIMER_LINE = "Eğitim çalışmasıdır; bilirkişi raporu veya uzman görüşü yerine geçmez.";
