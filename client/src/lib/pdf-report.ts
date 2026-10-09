@@ -247,6 +247,30 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
     for (let i = 0; i < fileInfo.length; i += 3) infoRows.push(fileInfo.slice(i, i + 3).map(infoCell));
 
     const content: Content[] = [
+        /* Bilgilendirme: ilk sayfada üst bölümde tek başına durur (bu sayfada başlıktaki kısa uyarı gösterilmez) */
+        {
+            margin: [0, -62, 0, 14],
+            table: {
+                widths: ["*"],
+                body: [
+                    [
+                        {
+                            fillColor: C.brandSoft,
+                            margin: [10, 7, 10, 7],
+                            stack: [
+                                { text: DISCLAIMER_TITLE, bold: true, fontSize: 8.5, margin: [0, 0, 0, 4] },
+                                ...DISCLAIMER_PARAGRAPHS.map((t): Content => ({ text: t, margin: [0, 0, 0, 3] })),
+                            ],
+                            fontSize: 7.5,
+                            color: C.brandDark,
+                            lineHeight: 1.25,
+                        },
+                    ],
+                ],
+            },
+            layout: { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: () => C.brand, vLineColor: () => C.brand },
+        },
+
         /* Kapak başlığı */
         {
             columns: [
@@ -276,30 +300,6 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
                 paddingTop: () => 5,
                 paddingBottom: () => 5,
             },
-        },
-
-        /* Sorumluluk reddi */
-        {
-            margin: [0, 10, 0, 0],
-            table: {
-                widths: ["*"],
-                body: [
-                    [
-                        {
-                            fillColor: C.brandSoft,
-                            margin: [10, 7, 10, 7],
-                            stack: [
-                                { text: DISCLAIMER_TITLE, bold: true, fontSize: 8.5, margin: [0, 0, 0, 4] },
-                                ...DISCLAIMER_PARAGRAPHS.map((t): Content => ({ text: t, margin: [0, 0, 0, 3] })),
-                            ],
-                            fontSize: 7.5,
-                            color: C.brandDark,
-                            lineHeight: 1.25,
-                        },
-                    ],
-                ],
-            },
-            layout: { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: () => C.brand, vLineColor: () => C.brand },
         },
 
         /* Toplam */
@@ -528,32 +528,34 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
 
         /* Kararlar */
         sectionTitle("Dayanılan Yargıtay kararları", { pageBreak: true }),
+        // Kararlar tek sayfaya sığacak şekilde sıkı dizilir
         ...PRECEDENTS.map(
             (p): Content => ({
                 unbreakable: true,
-                margin: [0, 0, 0, 10],
+                margin: [0, 0, 0, 7],
                 table: {
-                    widths: [3, "*"],
+                    widths: [2.5, "*"],
                     body: [
                         [
                             { text: "", fillColor: C.brand, rowSpan: 3 },
                             {
-                                stack: [
-                                    { text: `Yargıtay ${p.division}`, bold: true, fontSize: 10.5 },
-                                    { text: `E. ${p.esas}, K. ${p.karar}${p.tarih ? `, T. ${p.tarih}` : ""}`, fontSize: 8.5, color: C.muted, margin: [0, 1, 0, 0] },
+                                text: [
+                                    { text: `Yargıtay ${p.division}`, bold: true, color: C.ink },
+                                    { text: `  ·  E. ${p.esas}, K. ${p.karar}${p.tarih ? `, T. ${p.tarih}` : ""}`, color: C.muted, fontSize: 8 },
                                 ],
-                                margin: [8, 2, 0, 0],
+                                fontSize: 9.5,
+                                margin: [7, 1, 0, 0],
                             },
                         ],
-                        [{}, { text: p.text, italics: true, fontSize: 9, color: "#334155", lineHeight: 1.25, margin: [8, 4, 0, 4] }],
+                        [{}, { text: p.text, italics: true, fontSize: 8, color: "#334155", lineHeight: 1.15, margin: [7, 2, 0, 3] }],
                         [
                             {},
                             {
                                 text: [{ text: "Hesaba yansıması: ", bold: true }, p.systemNote],
-                                fontSize: 8.5,
+                                fontSize: 7.5,
                                 color: C.green,
                                 fillColor: C.greenSoft,
-                                margin: [8, 5, 8, 5],
+                                margin: [7, 3, 7, 3],
                             },
                         ],
                     ],
@@ -592,18 +594,6 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
             layout: zebraLayout,
             fontSize: 8.5,
         } as Content,
-        {
-            unbreakable: true,
-            stack: [
-                sectionTitle(DISCLAIMER_TITLE),
-                {
-                    stack: DISCLAIMER_PARAGRAPHS.map((t): Content => ({ text: t, margin: [0, 0, 0, 5] })),
-                    fontSize: 9,
-                    color: C.muted,
-                    lineHeight: 1.3,
-                },
-            ],
-        } as Content,
     ];
 
     return {
@@ -611,8 +601,8 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
         pageMargins: [MARGIN_X, 118, MARGIN_X, 50],
         info: { title: `${BRAND.app} – eğitim çalışması`, author: BRAND.org, subject: "Eğitim amaçlı tazminat hesap çalışması" },
         defaultStyle: { font: "Roboto", fontSize: 9.5, color: C.ink, lineHeight: 1.15 },
-        // Her sayfanın üstünde logo, marka ve eğitim çalışması uyarısı yer alır
-        header: () => ({
+        // Her sayfanın üstünde logo ve marka, ikinci sayfadan itibaren kısa uyarı yer alır
+        header: (page: number) => ({
             margin: [MARGIN_X, 22, MARGIN_X, 0],
             stack: [
                 {
@@ -629,7 +619,8 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
                         { width: 150, text: `Kaza ${d(inputs.accidentDate)} · Hesap ${d(inputs.calcDate)}`, alignment: "right", fontSize: 7.5, color: C.muted, margin: [0, 9, 0, 0] },
                     ],
                 },
-                {
+                // İlk sayfada ayrıntılı bilgilendirme kutusu bu alanı kullanır; kısa uyarı ikinci sayfadan itibaren yer alır
+                page === 1 ? { text: "" } : {
                     margin: [0, 7, 0, 0],
                     table: { widths: ["*"], body: [[{ text: [{ text: `${DISCLAIMER_LEAD} `, bold: true }, DISCLAIMER_SHORT], fontSize: 7, color: C.brandDark, fillColor: C.brandSoft, margin: [6, 4, 6, 4], lineHeight: 1.2 }]] },
                     layout: { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: () => C.brand, vLineColor: () => C.brand },
