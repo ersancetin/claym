@@ -157,7 +157,7 @@ export default function App() {
                         Meslektaş dayanışması <span className="text-muted">·</span> Eğitim çalışması <span className="text-muted">·</span> Ücretsiz
                     </p>
                     <h1 className="mt-4 font-heading text-[1.9rem] sm:text-[2.6rem] font-bold leading-[1.15] tracking-tight text-ink max-w-[22ch] animate-rise [animation-delay:80ms]">
-                        Sürekli maluliyet tazminatı hesaplama
+                        Maluliyet tazminatı hesaplama
                     </h1>
                     <p className="mt-3 max-w-[64ch] text-[15px] font-light leading-relaxed text-ink/80 animate-rise [animation-delay:160ms]">
                         Sürekli iş göremezlik, geçici iş göremezlik ve geçici bakıcı gideri; Yargıtay kararları doğrultusunda, TRH-2010 yaşam tablosu ve dönemsel asgari ücretlerle,
