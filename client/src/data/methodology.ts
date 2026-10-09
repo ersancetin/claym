@@ -1,4 +1,4 @@
-/** Hesaplama esasları; hem ekranda hem PDF raporunda kullanılır */
+/** Hesaplama esasları; hem ekranda hem PDF çıktısında kullanılır */
 export const METHOD_NOTES: string[] = [
     "Bakiye ömür, Yargıtay 4. HD 2023/13132 E., 2024/524 K. ve 2022/16229 E., 2024/13018 K. kararları uyarınca TRH-2010 yaşam tablosundan kaza tarihindeki tam yaşa göre doğrusal enterpolasyonla bulunur; beklenen ömür sonu kaza tarihine eklenerek belirlenir.",
     "Geçici iş göremezlik, her ay için bir aylık net asgari ücret ve %100 gelir kaybı esasıyla hesaplanır. Süre ücret dönemlerine paylaştırılırken kaza günü sayılmaz; kaza ayında kalan günler (ayın gün sayısı − kaza günü) 30'a bölünerek ay kesrine çevrilir. Kaza tarihinde 18 yaşından küçük ve çalışmayan kişide bu kalem uyarıyla birlikte hesaplanır ve toplama dahil edilir.",
@@ -11,9 +11,18 @@ export const METHOD_NOTES: string[] = [
     "Geçici iş göremezlik süresi, sürekli iş göremezlik bilinen döneminden düşülür.",
 ];
 
-/** Sorumluluk reddi; site başlığında, altbilgide ve PDF raporunda gösterilir */
-export const DISCLAIMER_SHORT =
-    "Bu araç bilgilendirme amaçlıdır; hukuki danışmanlık, aktüerya hizmeti veya bilirkişi raporu yerine geçmez.";
+/** Marka bilgileri; sitede ve PDF çıktısında kullanılır */
+export const BRAND = {
+    org: "Cumhuriyet Avukatları",
+    orgUpper: "CUMHURİYET AVUKATLARI",
+    app: "Maluliyet Tazminatı Hesaplama",
+    url: "https://cumhuriyetavukatlari.com",
+} as const;
 
+/** Kısa uyarı; sitenin üst şeridinde, giriş ekranında ve PDF'in her sayfasının üstünde gösterilir */
+export const DISCLAIMER_SHORT =
+    "Bu çalışma, Cumhuriyet Avukatları tarafından meslektaş dayanışması amacıyla Yargıtay kararları doğrultusunda hazırlanmış bir eğitim çalışmasıdır. Aktüerya raporu değildir; bilirkişi raporu yerine geçmez.";
+
+/** Ayrıntılı uyarı; sitenin altbilgisinde ve PDF'in ilk ve son sayfasında gösterilir */
 export const DISCLAIMER_FULL =
-    "Bu hesaplama yalnızca bilgilendirme amacıyla, kullanıcının girdiği veriler esas alınarak otomatik olarak üretilmiştir. Hukuki danışmanlık, aktüerya hizmeti veya bilirkişi raporu niteliği taşımaz ve bunların yerine geçmez. Sonuçlar; dosyaya özgü koşullara, yargı kararlarındaki değişikliklere ve güncellenen asgari ücret verilerine göre farklılık gösterebilir. Bu hesaplamaya dayanılarak yapılan işlem ve verilen kararlardan ClaymHero sorumlu tutulamaz; kesin sonuç için bir avukat veya uzman bilirkişiye başvurulmalıdır.";
+    "Bu hesaplama, Cumhuriyet Avukatları tarafından meslektaş dayanışması amacıyla, Yargıtay kararları doğrultusunda hazırlanmış bir eğitim çalışmasıdır. Aktüerya raporu, bilirkişi raporu veya hukuki görüş niteliği taşımaz, bunların yerine geçmez ve delil olarak kullanılmak üzere hazırlanmamıştır. Sonuçlar yalnızca kullanıcının girdiği verilere göre otomatik olarak üretilir; dosyaya özgü koşullar, yargı kararlarındaki değişiklikler ve güncellenen asgari ücret verileri sonucu değiştirebilir. Somut dosyada tazminat hesabı, mahkemece görevlendirilen bilirkişi tarafından yapılır. Bu çalışmaya dayanılarak yapılan işlem ve verilen kararlardan Cumhuriyet Avukatları sorumlu tutulamaz.";

@@ -76,17 +76,17 @@ export function ParameterPanel({ draft, errors, busy, stale, hasResult, onChange
             onSubmit={submit}
             noValidate
             aria-labelledby="params-title"
-            className="rounded-3xl bg-white p-5 sm:p-7 shadow-[0_20px_60px_-24px_rgba(20,33,61,0.35)] ring-1 ring-ink/5"
+            className="rounded-3xl border border-line/80 bg-white p-5 sm:p-7 shadow-sm"
         >
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 id="params-title" className="font-serif text-xl font-semibold">Dosya bilgileri</h2>
+                    <h2 id="params-title" className="font-heading text-xl font-bold tracking-tight">Dosya bilgileri</h2>
                     <p className="text-[13px] text-muted mt-0.5">Alanları doldurup hesaplayın</p>
                 </div>
                 <button
                     type="button"
                     onClick={onReset}
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-muted hover:text-ink hover:bg-paper transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-line px-3.5 py-1.5 text-xs font-medium text-muted hover:border-brand hover:text-brand transition-colors"
                 >
                     <RotateCcw className="h-3.5 w-3.5" /> Temizle
                 </button>
@@ -94,7 +94,7 @@ export function ParameterPanel({ draft, errors, busy, stale, hasResult, onChange
 
             <div className="space-y-5">
                 <Field label="Cinsiyet" error={errors.gender}>
-                    <div role="radiogroup" aria-label="Cinsiyet" className="grid grid-cols-2 gap-1 rounded-xl bg-paper p-1 ring-1 ring-line">
+                    <div role="radiogroup" aria-label="Cinsiyet" className="grid grid-cols-2 gap-1 rounded-full bg-paper p-1 ring-1 ring-line">
                         {([["M", "Erkek"], ["F", "Kadın"]] as const).map(([val, label]) => (
                             <button
                                 key={val}
@@ -103,8 +103,8 @@ export function ParameterPanel({ draft, errors, busy, stale, hasResult, onChange
                                 aria-checked={draft.gender === val}
                                 onClick={() => set("gender", val)}
                                 className={cn(
-                                    "rounded-lg py-2.5 text-sm font-medium transition-all duration-200",
-                                    draft.gender === val ? "bg-ink text-white shadow-sm" : "text-muted hover:text-ink hover:bg-white"
+                                    "rounded-full py-2.5 text-sm font-semibold transition-all duration-200",
+                                    draft.gender === val ? "bg-brand text-white shadow-sm" : "text-muted hover:text-ink hover:bg-white"
                                 )}
                             >
                                 {label}
@@ -169,9 +169,8 @@ export function ParameterPanel({ draft, errors, busy, stale, hasResult, onChange
                 type="submit"
                 disabled={busy}
                 className={cn(
-                    "group relative mt-7 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl py-3.5 text-[15px] font-semibold text-white",
-                    "bg-gradient-to-r from-brand to-[#3b6ff0] shadow-[0_10px_30px_-10px_rgba(34,87,214,0.7)]",
-                    "transition-all duration-200 hover:shadow-[0_14px_36px_-10px_rgba(34,87,214,0.85)] hover:-translate-y-px active:translate-y-0 disabled:cursor-wait",
+                    "group relative mt-7 flex w-full items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3.5 text-[15px] font-semibold text-white",
+                    "bg-brand shadow-sm transition-colors duration-200 hover:bg-brand-dark active:bg-brand-dark disabled:cursor-wait",
                     stale && "animate-pulse-ring"
                 )}
             >
@@ -212,7 +211,7 @@ function Field({ label, children, error, htmlFor, action }: { label: string; chi
 }
 
 const inputClass =
-    "num w-full rounded-xl bg-paper/70 border border-line px-3.5 py-2.5 text-[15px] text-ink placeholder:text-ink/30 transition-all duration-150 focus:outline-none focus:bg-white focus:border-brand focus:ring-4 focus:ring-brand/10";
+    "num w-full rounded-xl bg-paper/70 border border-line px-3.5 py-2.5 text-[15px] text-ink placeholder:text-ink/30 transition-all duration-150 focus:outline-none focus:bg-white focus:border-brand focus:ring-2 focus:ring-brand/20";
 
 function parseTypedDate(raw: string): Date | null {
     const s = raw.trim();
@@ -291,7 +290,7 @@ function DateField({
             error={formatError ?? error}
             action={
                 action && (
-                    <button type="button" onClick={action.onClick} className="text-xs font-medium text-brand hover:text-ink transition-colors">
+                    <button type="button" onClick={action.onClick} className="text-xs font-semibold text-brand hover:text-brand-dark transition-colors">
                         {action.label}
                     </button>
                 )
@@ -314,7 +313,7 @@ function DateField({
                         onChange(parseTypedDate(masked));
                     }}
                     onBlur={() => setTouched(true)}
-                    className={cn(inputClass, "pr-11", (formatError ?? error) && "border-red-400 focus:border-red-500 focus:ring-red-500/10")}
+                    className={cn(inputClass, "pr-11", (formatError ?? error) && "border-red-400 focus:border-red-500 focus:ring-red-500/20")}
                 />
                 <Popover.Root open={open} onOpenChange={setOpen}>
                     <Popover.Trigger
@@ -394,7 +393,7 @@ function NumberField({
                         const n = parseFloat(raw.replace(",", "."));
                         onChange(isNaN(n) ? null : Math.min(max, Math.max(0, n)));
                     }}
-                    className={cn(inputClass, "pr-11", error && "border-red-400 focus:border-red-500 focus:ring-red-500/10")}
+                    className={cn(inputClass, "pr-11", error && "border-red-400 focus:border-red-500 focus:ring-red-500/20")}
                 />
                 <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-muted">{suffix}</span>
             </div>

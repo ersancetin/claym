@@ -9,7 +9,7 @@ import { METHOD_NOTES } from "@/data/methodology";
 import { useCountUp, useMounted } from "@/lib/motion";
 import { cn, d, tl, years } from "@/lib/utils";
 
-const card = "rounded-3xl bg-white border border-line shadow-sm";
+const card = "rounded-3xl bg-white border border-line/80 shadow-sm";
 
 /* ---------- Boş durum ---------- */
 
@@ -17,16 +17,16 @@ export function EmptyState({ busy }: { busy: boolean }) {
     const steps = [
         { icon: FileText, title: "Bilgileri girin", text: "Cinsiyet, tarihler ve oranlar." },
         { icon: Calculator, title: "Hesapla'ya basın", text: "Tüm kalemler tek seferde hesaplanır." },
-        { icon: CalendarRange, title: "Sonucu inceleyin", text: "Dönem analizi, tablolar, PDF rapor." },
+        { icon: CalendarRange, title: "Sonucu inceleyin", text: "Dönem analizi, tablolar, PDF çıktısı." },
     ];
     return (
         <section className={cn(card, "relative overflow-hidden p-6 sm:p-10 animate-rise [animation-delay:280ms]")}>
             <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-brand-soft blur-2xl" />
             <div className="relative">
-                <div className={cn("flex h-14 w-14 items-center justify-center rounded-2xl bg-ink text-white shadow-lg", busy && "animate-pulse")}>
+                <div className={cn("flex h-14 w-14 items-center justify-center rounded-2xl bg-brand text-white shadow-sm", busy && "animate-pulse")}>
                     <Calculator className="h-6 w-6" />
                 </div>
-                <h2 className="mt-5 font-serif text-2xl sm:text-3xl font-semibold">
+                <h2 className="mt-5 font-heading text-2xl sm:text-3xl font-semibold">
                     {busy ? "Hesaplanıyor…" : "Hesaplamaya hazır"}
                 </h2>
                 <p className="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-muted">
@@ -80,7 +80,7 @@ export function Summary({ r }: { r: CalculationResult }) {
             <div aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-soft/80 blur-2xl" />
             <div className="relative">
                 <h2 id="summary-title" className="text-sm font-medium text-muted">Toplam maddi tazminat</h2>
-                <p className="num font-serif text-[2.1rem] sm:text-5xl lg:text-[3.4rem] font-semibold leading-tight mt-1 tracking-tight break-words">
+                <p className="num font-heading text-[2.1rem] sm:text-5xl lg:text-[3.4rem] font-semibold leading-tight mt-1 tracking-tight break-words">
                     <Amount value={total} /> <span className="text-xl sm:text-3xl text-muted font-medium">TL</span>
                 </p>
 
@@ -207,7 +207,7 @@ function Bar({ segments }: { segments: { label: string; days: number; color: str
 export function Timeline({ r }: { r: CalculationResult }) {
     return (
         <section aria-labelledby="tl-title" className={cn(card, "p-5 sm:p-7 space-y-6 animate-rise [animation-delay:420ms]")}>
-            <h3 id="tl-title" className="flex items-center gap-2 font-serif text-lg font-semibold">
+            <h3 id="tl-title" className="flex items-center gap-2 font-heading text-lg font-semibold">
                 <Clock className="h-4 w-4 text-brand" /> Dönem analizi
             </h3>
             <div>
@@ -240,9 +240,9 @@ export function Timeline({ r }: { r: CalculationResult }) {
 /* ---------- Hesap tabloları ---------- */
 
 const typeLabel: Record<NonNullable<CompensationRow["type"]>, [string, string]> = {
-    active: ["Aktif", "bg-blue-50 text-active"],
+    active: ["Aktif", "bg-brand-soft text-active"],
     passive: ["Pasif", "bg-amber-50 text-passive"],
-    temp: ["Geçici", "bg-orange-50 text-temp"],
+    temp: ["Geçici", "bg-blue-50 text-temp"],
     perm: ["Bilinen", "bg-slate-100 text-known"],
     caretaker: ["Bakıcı", "bg-violet-50 text-care"],
 };
@@ -252,7 +252,7 @@ export function CompensationTable({ title, rows, total, wageType = "net" }: { ti
     return (
         <section className={cn(card, "overflow-hidden")}>
             <header className="flex items-center justify-between gap-4 px-4 sm:px-6 py-4 border-b border-line">
-                <h3 className="font-serif text-base sm:text-lg font-semibold leading-snug">{title}</h3>
+                <h3 className="font-heading text-base sm:text-lg font-semibold leading-snug">{title}</h3>
                 <span className="num font-semibold whitespace-nowrap rounded-lg bg-brand-soft px-2.5 py-1 text-sm text-brand">{tl(total)} TL</span>
             </header>
             <div className="max-h-[440px] overflow-auto">
@@ -307,9 +307,9 @@ export function WageTable() {
     const rows = [...MIN_WAGES].reverse();
     const fmt = (s: string) => s.split("-").reverse().join(".");
     return (
-        <section className="rounded-3xl bg-white border border-line shadow-sm overflow-hidden">
+        <section className={cn(card, "overflow-hidden")}>
             <header className="px-5 py-4 border-b border-line">
-                <h3 className="font-serif text-lg font-semibold">Hesapta kullanılan asgari ücretler</h3>
+                <h3 className="font-heading text-lg font-semibold">Hesapta kullanılan asgari ücretler</h3>
                 <p className="text-sm text-muted mt-1">
                     16 yaş üstü işçiler için aylık tutarlar. 2012 ile 2021 arasındaki net tutarlar bekar AGİ dahildir; 2022'den itibaren AGİ uygulanmadığından iki sütun eşittir.
                 </p>
@@ -358,7 +358,7 @@ function Formula({ no, title, children, example }: { no: number; title: string; 
                 <span className="num flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-xs text-brand">{no}</span>
                 {title}
             </p>
-            <div className="formula mt-3 overflow-x-auto rounded-xl bg-paper px-4 py-3 font-serif text-[15px] sm:text-base leading-relaxed text-ink">
+            <div className="formula mt-3 overflow-x-auto rounded-xl bg-paper px-4 py-3 font-heading text-[15px] sm:text-base leading-relaxed text-ink">
                 {children}
             </div>
             {example && <div className="num mt-3 text-[13px] leading-relaxed text-muted">{example}</div>}
@@ -366,7 +366,7 @@ function Formula({ no, title, children, example }: { no: number; title: string; 
     );
 }
 
-const V = ({ children }: { children: ReactNode }) => <i className="font-serif">{children}</i>;
+const V = ({ children }: { children: ReactNode }) => <i className="font-heading">{children}</i>;
 
 export function Methodology({ r, inputs }: { r?: CalculationResult; inputs?: ActuarialInputs }) {
     const x = r?.exactAge ?? 0;
@@ -380,7 +380,7 @@ export function Methodology({ r, inputs }: { r?: CalculationResult; inputs?: Act
     return (
         <div className="space-y-6">
             <section className={cn(card, "p-5 sm:p-7")}>
-                <h3 className="flex items-center gap-2 font-serif text-lg font-semibold">
+                <h3 className="flex items-center gap-2 font-heading text-lg font-semibold">
                     <Sigma className="h-4 w-4 text-brand" /> Formüller
                 </h3>
                 <p className="mt-1 text-sm text-muted max-w-[72ch]">
@@ -474,14 +474,14 @@ export function Methodology({ r, inputs }: { r?: CalculationResult; inputs?: Act
             </section>
 
             <section className={cn(card, "print-avoid p-5 sm:p-7")}>
-                <h3 className="font-serif text-lg font-semibold">Hesaplama esasları</h3>
+                <h3 className="font-heading text-lg font-semibold">Hesaplama esasları</h3>
                 <ul className="mt-3 list-disc space-y-2 pl-5 text-[15px] leading-relaxed text-ink/85 max-w-[80ch] marker:text-brand">
                     {METHOD_NOTES.map((n) => <li key={n}>{n}</li>)}
                 </ul>
             </section>
 
             <section>
-                <h3 className="flex items-center gap-2 font-serif text-lg font-semibold mb-3">
+                <h3 className="flex items-center gap-2 font-heading text-lg font-semibold mb-3">
                     <Scale className="h-4 w-4 text-brand" /> Dayanılan Yargıtay kararları
                 </h3>
                 <div className="grid gap-4 lg:grid-cols-2 print:grid-cols-1">
@@ -493,7 +493,7 @@ export function Methodology({ r, inputs }: { r?: CalculationResult; inputs?: Act
                                     E. {p.esas}, K. {p.karar}{p.tarih ? `, T. ${p.tarih}` : ""}
                                 </p>
                             </header>
-                            <blockquote className="mt-3 border-l-2 border-brand/40 pl-3 font-serif text-[15px] leading-relaxed text-ink/80 flex-1">
+                            <blockquote className="mt-3 border-l-2 border-brand/40 pl-3 font-heading text-[15px] leading-relaxed text-ink/80 flex-1">
                                 {p.text}
                             </blockquote>
                             <p className="mt-4 rounded-xl bg-emerald-50 px-3 py-2.5 text-[13px] text-emerald-900">

@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 // base: "./" sayesinde site hem https://kullanici.github.io/repo-adi/ altında
-// hem de özel alan adında (claymhero.com) ek ayar gerekmeden çalışır.
+// hem de özel alan adında ek ayar gerekmeden çalışır.
 export default defineConfig({
   base: "./",
   plugins: [react(), tailwindcss()],

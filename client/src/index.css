@@ -1,22 +1,32 @@
 @import "tailwindcss";
+@import "@fontsource/montserrat/300.css";
+@import "@fontsource/montserrat/400.css";
+@import "@fontsource/montserrat/500.css";
+@import "@fontsource/montserrat/600.css";
+@import "@fontsource/montserrat/700.css";
+@import "@fontsource/montserrat/400-italic.css";
 
 @theme {
-  --color-ink: #14213d;
-  --color-ink-2: #1f3056;
-  --color-paper: #f5f6f8;
-  --color-line: #dde2ea;
-  --color-muted: #5b6678;
-  --color-brand: #2257d6;
-  --color-brand-soft: #e8eefc;
-  --color-known: #64748b;
-  --color-future: #0f7f74;
-  --color-active: #2257d6;
-  --color-passive: #b7791f;
+  /* Cumhuriyet Avukatları görsel kimliği (GateOS kılavuzu, bölüm 4) */
+  --color-ink: #2d3039;          /* Foreground: koyu antrasit */
+  --color-ink-2: #3b3f4a;
+  --color-canvas: #f7f7f9;       /* sayfa zemini */
+  --color-paper: #f0f1f4;        /* Muted background */
+  --color-line: #d1d3d9;         /* Border gray */
+  --color-muted: #7f828a;        /* Text gray */
+  --color-brand: #c81d25;        /* Primary: AHA Red */
+  --color-brand-dark: #a31219;   /* Primary dark: hover / basılı */
+  --color-brand-soft: #fbeaeb;
+  --color-bordo: rgba(139, 0, 0, 0.85);
+  --color-known: #7f828a;
+  --color-future: #0f766e;
+  --color-active: #c81d25;
+  --color-passive: #a16207;
   --color-care: #7c3aed;
-  --color-temp: #c2410c;
+  --color-temp: #2563eb;
 
-  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-sans: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-heading: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --animate-rise: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   --animate-pop: pop 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -46,8 +56,8 @@
     to { transform: translateX(100%); }
   }
   @keyframes pulse-ring {
-    0% { box-shadow: 0 0 0 0 rgba(34, 87, 214, 0.45); }
-    100% { box-shadow: 0 0 0 12px rgba(34, 87, 214, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(200, 29, 37, 0.45); }
+    100% { box-shadow: 0 0 0 12px rgba(200, 29, 37, 0); }
   }
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
@@ -59,7 +69,7 @@
 @layer base {
   html { -webkit-text-size-adjust: 100%; }
   body {
-    @apply bg-paper text-ink font-sans antialiased;
+    @apply bg-canvas text-ink font-sans antialiased;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .num { font-variant-numeric: tabular-nums lining-nums; }

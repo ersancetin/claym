@@ -6,7 +6,8 @@ import { wageAt, type CalculationResult, type CompensationRow } from "@/lib/actu
 import { TRH2010 } from "@/data/trh2010";
 import { MIN_WAGES, LATEST_MIN_WAGE } from "@/data/min-wages";
 import { PRECEDENTS } from "@/data/precedents";
-import { DISCLAIMER_FULL, DISCLAIMER_SHORT, METHOD_NOTES } from "@/data/methodology";
+import { BRAND, DISCLAIMER_FULL, DISCLAIMER_SHORT, METHOD_NOTES } from "@/data/methodology";
+import logoUrl from "@/assets/logo.png";
 import { d, tl, years } from "@/lib/utils";
 
 // vfs_fonts paketi sürüme göre ya doğrudan ya da pdfMake.vfs altında dışa aktarır
@@ -14,19 +15,21 @@ const fonts = pdfFonts as unknown as { vfs?: Record<string, string>; pdfMake?: {
 (pdfMake as unknown as { vfs: Record<string, string> }).vfs =
     fonts.pdfMake?.vfs ?? fonts.vfs ?? (fonts.default as Record<string, string>) ?? (fonts as unknown as Record<string, string>);
 
+// Cumhuriyet Avukatları görsel kimliği (sitedeki index.css ile aynı)
 const C = {
-    ink: "#14213d",
-    brand: "#2257d6",
-    brandSoft: "#e8eefc",
-    muted: "#5b6678",
-    line: "#dde2ea",
-    paper: "#f5f6f8",
-    known: "#64748b",
-    future: "#0f7f74",
-    active: "#2257d6",
-    passive: "#b7791f",
+    ink: "#2d3039",
+    brand: "#c81d25",
+    brandDark: "#a31219",
+    brandSoft: "#fbeaeb",
+    muted: "#7f828a",
+    line: "#d1d3d9",
+    paper: "#f0f1f4",
+    known: "#7f828a",
+    future: "#0f766e",
+    active: "#c81d25",
+    passive: "#a16207",
     care: "#7c3aed",
-    temp: "#c2410c",
+    temp: "#2563eb",
     green: "#065f46",
     greenSoft: "#ecfdf5",
     amber: "#92400e",
@@ -40,11 +43,19 @@ const CONTENT_W = PAGE_W - MARGIN_X * 2;
 const n2 = (n: number, digits = 2) => n.toLocaleString("tr-TR", { minimumFractionDigits: digits, maximumFractionDigits: digits });
 const pct = (n: number) => n.toLocaleString("tr-TR", { maximumFractionDigits: 2 });
 
-const LOGO_SVG = `<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-<path d="M16 3L26.3923 9V10L16 16L5.6077 10V9L16 3Z" fill="#60A5FA"/>
-<path d="M26.3923 10V22L16 28V16L26.3923 10Z" fill="#2563EB"/>
-<path d="M5.6077 10V22L16 28V16L5.6077 10Z" fill="#3B82F6"/>
-<circle cx="16" cy="16" r="2" fill="#ffffff"/></svg>`;
+/** Logo, PDF'e gömülmek üzere data URL olarak bir kez yüklenir */
+let logoData: string | null = null;
+
+export async function preloadReportAssets(): Promise<void> {
+    if (logoData) return;
+    const blob = await (await fetch(logoUrl)).blob();
+    logoData = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+    });
+}
 
 /* ---------- küçük yapı taşları ---------- */
 
@@ -187,9 +198,9 @@ function formulaBlock(no: number, title: string, formula: Content, example?: Con
 const it = (text: string) => ({ text, italics: true });
 const sub = (text: string) => ({ text, sub: true, fontSize: 8 });
 
-/* ---------- rapor ---------- */
+/* ---------- PDF çıktısı ---------- */
 
-export function buildReport(inputs: ActuarialInputs, r: CalculationResult): TDocumentDefinitions {
+export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo: string): TDocumentDefinitions {
     const x = r.exactAge;
     const fl = Math.floor(x);
     const t = x - fl;
@@ -236,15 +247,14 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult): TDoc
                 {
                     width: "*",
                     stack: [
-                        { columns: [{ svg: LOGO_SVG, width: 22 }, { text: [{ text: "Claym", color: C.ink }, { text: "Hero", color: C.brand }], bold: true, fontSize: 14, margin: [6, 3, 0, 0] }] },
-                        { text: "Sürekli maluliyet tazminatı hesap raporu", fontSize: 18, bold: true, margin: [0, 12, 0, 2] },
-                        { text: "TRH-2010 yaşam tablosu, dönemsel asgari ücretler ve Yargıtay içtihadı esas alınarak hazırlanmıştır.", fontSize: 9, color: C.muted },
+                        { text: "Sürekli maluliyet tazminatı hesap çalışması", fontSize: 18, bold: true, margin: [0, 0, 0, 2] },
+                        { text: "Meslektaş dayanışması amacıyla, Yargıtay kararları doğrultusunda TRH-2010 yaşam tablosu ve dönemsel asgari ücretlerle hazırlanmış eğitim çalışması.", fontSize: 9, color: C.muted },
                     ],
                 },
-                { width: 90, stack: [{ text: "Rapor tarihi", fontSize: 8, color: C.muted, alignment: "right" }, { text: today, bold: true, alignment: "right" }], margin: [0, 4, 0, 0] },
+                { width: 90, stack: [{ text: "Oluşturulma tarihi", fontSize: 8, color: C.muted, alignment: "right" }, { text: today, bold: true, alignment: "right" }], margin: [0, 4, 0, 0] },
             ],
         },
-        { canvas: [{ type: "line", x1: 0, y1: 8, x2: CONTENT_W, y2: 8, lineWidth: 2, lineColor: C.ink }], margin: [0, 0, 0, 12] },
+        { canvas: [{ type: "line", x1: 0, y1: 8, x2: CONTENT_W, y2: 8, lineWidth: 2, lineColor: C.brand }], margin: [0, 0, 0, 12] },
 
         /* Dosya bilgileri */
         { text: "DOSYA BİLGİLERİ", fontSize: 8, bold: true, color: C.muted, characterSpacing: 0.6, margin: [0, 0, 0, 5] },
@@ -270,17 +280,17 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult): TDoc
                 body: [
                     [
                         {
-                            fillColor: C.amberSoft,
+                            fillColor: C.brandSoft,
                             margin: [10, 7, 10, 7],
-                            text: [{ text: "Sorumluluk reddi: ", bold: true }, DISCLAIMER_FULL],
+                            text: [{ text: "Önemli uyarı: ", bold: true }, DISCLAIMER_FULL],
                             fontSize: 7.5,
-                            color: C.amber,
+                            color: C.brandDark,
                             lineHeight: 1.25,
                         },
                     ],
                 ],
             },
-            layout: { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: () => "#fcd34d", vLineColor: () => "#fcd34d" },
+            layout: { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: () => C.brand, vLineColor: () => C.brand },
         },
 
         /* Toplam */
@@ -573,25 +583,40 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult): TDoc
             layout: zebraLayout,
             fontSize: 8.5,
         } as Content,
-        sectionTitle("Sorumluluk reddi"),
+        sectionTitle("Önemli uyarı"),
         { text: DISCLAIMER_FULL, fontSize: 9, color: C.muted, lineHeight: 1.3 },
     ];
 
     return {
         pageSize: "A4",
-        pageMargins: [MARGIN_X, 48, MARGIN_X, 50],
-        info: { title: "Sürekli maluliyet tazminatı hesap raporu", author: "ClaymHero", subject: "Tazminat hesabı" },
+        pageMargins: [MARGIN_X, 112, MARGIN_X, 50],
+        info: { title: `${BRAND.app} – eğitim çalışması`, author: BRAND.org, subject: "Eğitim amaçlı tazminat hesap çalışması" },
         defaultStyle: { font: "Roboto", fontSize: 9.5, color: C.ink, lineHeight: 1.15 },
-        header: (page: number) =>
-            page === 1
-                ? { text: "" }
-                : {
-                      margin: [MARGIN_X, 20, MARGIN_X, 0],
-                      columns: [
-                          { text: [{ text: "Claym", bold: true }, { text: "Hero", bold: true, color: C.brand }, { text: "  ·  Sürekli maluliyet tazminatı hesap raporu", color: C.muted }], fontSize: 8 },
-                          { text: `Kaza ${d(inputs.accidentDate)} · Hesap ${d(inputs.calcDate)}`, alignment: "right", fontSize: 8, color: C.muted },
-                      ],
-                  },
+        // Her sayfanın üstünde logo, marka ve eğitim çalışması uyarısı yer alır
+        header: () => ({
+            margin: [MARGIN_X, 22, MARGIN_X, 0],
+            stack: [
+                {
+                    columns: [
+                        { width: 30, image: logo, fit: [30, 30] },
+                        {
+                            width: "*",
+                            margin: [8, 3, 0, 0],
+                            stack: [
+                                { text: BRAND.orgUpper, bold: true, fontSize: 8.5, characterSpacing: 1, color: C.ink },
+                                { text: BRAND.app, italics: true, fontSize: 8, color: C.brand, margin: [0, 1, 0, 0] },
+                            ],
+                        },
+                        { width: 150, text: `Kaza ${d(inputs.accidentDate)} · Hesap ${d(inputs.calcDate)}`, alignment: "right", fontSize: 7.5, color: C.muted, margin: [0, 9, 0, 0] },
+                    ],
+                },
+                {
+                    margin: [0, 7, 0, 0],
+                    table: { widths: ["*"], body: [[{ text: DISCLAIMER_SHORT, fontSize: 7, bold: true, color: C.brandDark, fillColor: C.brandSoft, margin: [6, 4, 6, 4], lineHeight: 1.2 }]] },
+                    layout: { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: () => C.brand, vLineColor: () => C.brand },
+                },
+            ],
+        }),
         footer: (page: number, pages: number) => ({
             margin: [MARGIN_X, 10, MARGIN_X, 0],
             stack: [
@@ -599,8 +624,8 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult): TDoc
                 {
                     margin: [0, 5, 0, 0],
                     columns: [
-                        { width: "*", text: DISCLAIMER_SHORT, fontSize: 7, color: C.muted },
-                        { width: 110, text: `Rapor tarihi ${today}  ·  ${page} / ${pages}`, alignment: "right", fontSize: 7, color: C.muted },
+                        { width: "*", text: `© ${new Date().getFullYear()} ${BRAND.org} · Eğitim çalışmasıdır; aktüerya raporu değildir, bilirkişi raporu yerine geçmez.`, fontSize: 7, color: C.muted },
+                        { width: 110, text: `${today}  ·  ${page} / ${pages}`, alignment: "right", fontSize: 7, color: C.muted },
                     ],
                 },
             ],
@@ -614,7 +639,8 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult): TDoc
     };
 }
 
-export function downloadReport(inputs: ActuarialInputs, r: CalculationResult) {
+export async function downloadReport(inputs: ActuarialInputs, r: CalculationResult): Promise<void> {
+    await preloadReportAssets();
     const stamp = d(inputs.calcDate).split(".").reverse().join("-");
-    pdfMake.createPdf(buildReport(inputs, r)).download(`ClaymHero-tazminat-raporu-${stamp}.pdf`);
+    pdfMake.createPdf(buildReport(inputs, r, logoData!)).download(`maluliyet-hesap-calismasi-${stamp}.pdf`);
 }
