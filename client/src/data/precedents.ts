@@ -38,6 +38,14 @@ export const PRECEDENTS: Precedent[] = [
         systemNote: "Bakiye ömür TRH-2010 tablosundan, kaza tarihindeki tam yaşa göre doğrusal enterpolasyonla bulunur.",
     },
     {
+        division: "4. Hukuk Dairesi",
+        esas: "2024/8759",
+        karar: "2026/1591",
+        tarih: "16.02.2026",
+        text: "Dairemizin yerleşik uygulamasına göre davacının TRH 2010 Yaşam Tablosu'na göre muhtemel bakiye ömür süresi ile işleyecek aktif ve pasif dönemlerin, hesaplamaya esas olacak şekilde belirlenmesi gerekmektedir. Hükme esas alınan raporda bakiye ömür, hesap tarihindeki yaşa göre belirlenmiştir. Bu durumda; davacının TRH 2010 Yaşam Tablosu'na göre bakiye ömür süresinin kaza tarihindeki yaşına göre belirlenerek... ek rapor alınıp sonucuna göre karar verilmesi gerekirken eksik incelemeyle yazılı şekilde karar verilmesi doğru görülmemiştir.",
+        systemNote: "Bakiye ömür hesap tarihindeki yaşa göre değil, kaza tarihindeki yaşa göre belirlenir; aktif ve pasif dönemler TRH-2010'a göre ayrılır.",
+    },
+    {
         division: "Hukuk Genel Kurulu",
         esas: "1994/9-628",
         karar: "1995/694",
