@@ -6,7 +6,7 @@ import { wageAt, type CalculationResult, type CompensationRow } from "@/lib/actu
 import { TRH2010 } from "@/data/trh2010";
 import { MIN_WAGES, LATEST_MIN_WAGE } from "@/data/min-wages";
 import { PRECEDENTS } from "@/data/precedents";
-import { BRAND, DISCLAIMER_FULL, DISCLAIMER_SHORT, METHOD_NOTES } from "@/data/methodology";
+import { BRAND, DISCLAIMER_LINE, DISCLAIMER_POINTS, DISCLAIMER_SHORT, DISCLAIMER_TITLE, METHOD_NOTES } from "@/data/methodology";
 import logoUrl from "@/assets/logo.png";
 import { d, tl, years } from "@/lib/utils";
 
@@ -26,10 +26,10 @@ const C = {
     paper: "#f0f1f4",
     known: "#7f828a",
     future: "#0f766e",
-    active: "#c81d25",
+    active: "#1d4ed8",
     passive: "#a16207",
     care: "#7c3aed",
-    temp: "#2563eb",
+    temp: "#0891b2",
     green: "#065f46",
     greenSoft: "#ecfdf5",
     amber: "#92400e",
@@ -79,17 +79,6 @@ function sectionTitle(text: string, opts: { pageBreak?: boolean; number?: string
     } as Content;
 }
 
-function subTitle(text: string, right?: string): Content {
-    return {
-        columns: [
-            { text, bold: true, fontSize: 10.5, color: C.ink },
-            right ? { text: right, alignment: "right", bold: true, fontSize: 10.5, color: C.brand } : { text: "" },
-        ],
-        margin: [0, 12, 0, 6],
-        headlineLevel: 2,
-    } as Content;
-}
-
 /** Yatay çizgili, zebra desenli tablo düzeni */
 const zebraLayout = {
     hLineWidth: (i: number, node: ContentTable) => (i === 0 || i === node.table.body.length ? 0 : i === 1 ? 1 : 0.5),
@@ -114,7 +103,24 @@ const typeLabel: Record<NonNullable<CompensationRow["type"]>, [string, string]> 
 
 function compensationTable(title: string, rows: CompensationRow[], total: number, wageLabel: string): Content[] {
     if (rows.length === 0) return [];
+    // Başlık tablonun ilk başlık satırıdır; tablo sayfaya bölünürse her sayfada tekrarlanır
+    // ve sayfa sonunda tablodan ayrı kalmaz.
+    const titleRow: TableCell[] = [
+        {
+            colSpan: 5,
+            columns: [
+                { text: title, bold: true, fontSize: 10.5, color: C.ink },
+                { text: `${tl(total)} TL`, alignment: "right", bold: true, fontSize: 10.5, color: C.ink },
+            ],
+            margin: [-6, 10, -6, 2],
+        },
+        {},
+        {},
+        {},
+        {},
+    ];
     const body: TableCell[][] = [
+        titleRow,
         [th("Dönem"), th("Tür"), th("Gün", "right"), th(wageLabel, "right"), th("Tutar (TL)", "right")],
         ...rows.map((r): TableCell[] => {
             const tags = [r.type ? typeLabel[r.type][0] : "", r.agiExcluded ? "AGİ hariç" : "", r.projected ? "Güncel ücretle" : ""].filter(Boolean).join(", ");
@@ -131,18 +137,18 @@ function compensationTable(title: string, rows: CompensationRow[], total: number
             {},
             {},
             {},
-            { text: tl(total), alignment: "right", bold: true, color: C.brand },
+            { text: tl(total), alignment: "right", bold: true, color: C.ink },
         ],
     ];
+    const last = body.length - 1;
     return [
-        subTitle(title, `${tl(total)} TL`),
         {
-            table: { headerRows: 1, keepWithHeaderRows: 1, dontBreakRows: true, widths: ["*", 80, 36, 80, 80], body },
+            table: { headerRows: 2, keepWithHeaderRows: 1, dontBreakRows: true, widths: ["*", 80, 36, 80, 80], body },
             layout: {
                 ...zebraLayout,
-                hLineWidth: (i: number, node: ContentTable) => (i === 0 ? 0 : i === 1 || i === node.table.body.length - 1 ? 1 : i === node.table.body.length ? 0 : 0.5),
-                hLineColor: (i: number, node: ContentTable) => (i === 1 || i === node.table.body.length - 1 ? C.ink : C.line),
-                fillColor: (row: number, node: ContentTable) => (row === 0 ? C.paper : row === node.table.body.length - 1 ? C.brandSoft : null),
+                hLineWidth: (i: number) => (i <= 1 || i === body.length ? 0 : i === 2 || i === last ? 1 : 0.5),
+                hLineColor: (i: number) => (i === 2 || i === last ? C.ink : C.line),
+                fillColor: (row: number) => (row === 1 || row === last ? C.paper : null),
             },
             fontSize: 8.5,
         } as Content,
@@ -282,7 +288,10 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
                         {
                             fillColor: C.brandSoft,
                             margin: [10, 7, 10, 7],
-                            text: [{ text: "Önemli uyarı: ", bold: true }, DISCLAIMER_FULL],
+                            stack: [
+                                { text: DISCLAIMER_TITLE.toLocaleUpperCase("tr-TR"), bold: true, fontSize: 8, characterSpacing: 0.6, margin: [0, 0, 0, 4] },
+                                ...DISCLAIMER_POINTS.map((p, i): Content => ({ text: [{ text: `${i + 1}. ${p.title}. `, bold: true }, p.text], margin: [0, 0, 0, 2.5] })),
+                            ],
                             fontSize: 7.5,
                             color: C.brandDark,
                             lineHeight: 1.25,
@@ -583,13 +592,24 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
             layout: zebraLayout,
             fontSize: 8.5,
         } as Content,
-        sectionTitle("Önemli uyarı"),
-        { text: DISCLAIMER_FULL, fontSize: 9, color: C.muted, lineHeight: 1.3 },
+        {
+            unbreakable: true,
+            stack: [
+                sectionTitle(DISCLAIMER_TITLE),
+                {
+                    ol: DISCLAIMER_POINTS.map((p) => ({ text: [{ text: `${p.title}. `, bold: true, color: C.ink }, p.text], margin: [0, 0, 0, 4] })),
+                    fontSize: 9,
+                    color: C.muted,
+                    lineHeight: 1.3,
+                    markerColor: C.brand,
+                },
+            ],
+        } as Content,
     ];
 
     return {
         pageSize: "A4",
-        pageMargins: [MARGIN_X, 112, MARGIN_X, 50],
+        pageMargins: [MARGIN_X, 118, MARGIN_X, 50],
         info: { title: `${BRAND.app} – eğitim çalışması`, author: BRAND.org, subject: "Eğitim amaçlı tazminat hesap çalışması" },
         defaultStyle: { font: "Roboto", fontSize: 9.5, color: C.ink, lineHeight: 1.15 },
         // Her sayfanın üstünde logo, marka ve eğitim çalışması uyarısı yer alır
@@ -612,7 +632,7 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
                 },
                 {
                     margin: [0, 7, 0, 0],
-                    table: { widths: ["*"], body: [[{ text: DISCLAIMER_SHORT, fontSize: 7, bold: true, color: C.brandDark, fillColor: C.brandSoft, margin: [6, 4, 6, 4], lineHeight: 1.2 }]] },
+                    table: { widths: ["*"], body: [[{ text: [{ text: `${DISCLAIMER_TITLE}: `, bold: true }, DISCLAIMER_SHORT], fontSize: 7, color: C.brandDark, fillColor: C.brandSoft, margin: [6, 4, 6, 4], lineHeight: 1.2 }]] },
                     layout: { hLineWidth: () => 0.6, vLineWidth: () => 0.6, hLineColor: () => C.brand, vLineColor: () => C.brand },
                 },
             ],
@@ -624,7 +644,7 @@ export function buildReport(inputs: ActuarialInputs, r: CalculationResult, logo:
                 {
                     margin: [0, 5, 0, 0],
                     columns: [
-                        { width: "*", text: `© ${new Date().getFullYear()} ${BRAND.org} · Eğitim çalışmasıdır; aktüerya raporu değildir, bilirkişi raporu yerine geçmez.`, fontSize: 7, color: C.muted },
+                        { width: "*", text: `© ${new Date().getFullYear()} ${BRAND.org} · ${DISCLAIMER_LINE}`, fontSize: 7, color: C.muted },
                         { width: 110, text: `${today}  ·  ${page} / ${pages}`, alignment: "right", fontSize: 7, color: C.muted },
                     ],
                 },

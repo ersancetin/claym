@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Download, Loader2, LogOut, ShieldAlert } from "lucide-react";
+import { Download, Loader2, LogOut, Scale, ShieldAlert } from "lucide-react";
 import {
     EMPTY_DRAFT, ParameterPanel, legalRetirementAge,
     type ActuarialInputs, type Draft, type DraftErrors,
@@ -10,7 +10,7 @@ import { prefersReducedMotion } from "@/lib/motion";
 import { cn, d, tl } from "@/lib/utils";
 import { Logo } from "@/components/Logo";
 import { signOut } from "@/components/PasswordGate";
-import { BRAND, DISCLAIMER_FULL, DISCLAIMER_SHORT } from "@/data/methodology";
+import { BRAND, DISCLAIMER_LINE, DISCLAIMER_POINTS, DISCLAIMER_SHORT, DISCLAIMER_TITLE } from "@/data/methodology";
 
 const TABS = [
     { id: "tables", label: "Hesap tabloları", short: "Tablolar" },
@@ -271,15 +271,22 @@ export default function App() {
                             <Logo />
                             <p className="mt-3 leading-relaxed">Meslektaş dayanışması için hazırlandı. Ücretsiz, üyeliksiz; veri toplamaz.</p>
                         </div>
-                        <div className="max-w-[90ch] space-y-3 leading-relaxed">
-                            <p>
-                                <span className="font-semibold text-ink">Önemli uyarı. </span>{DISCLAIMER_FULL}
+                        <div className="max-w-[90ch] leading-relaxed">
+                            <p className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+                                <Scale className="h-4 w-4 text-brand" /> {DISCLAIMER_TITLE}
                             </p>
-                            <p>Tüm hesaplama tarayıcınızda yapılır; girdiğiniz bilgiler hiçbir sunucuya gönderilmez ve saklanmaz.</p>
+                            <ol className="mt-3 space-y-2">
+                                {DISCLAIMER_POINTS.map((p, i) => (
+                                    <li key={p.title} className="flex gap-2.5">
+                                        <span className="num mt-px font-semibold text-brand">{i + 1}.</span>
+                                        <span><span className="font-semibold text-ink">{p.title}. </span>{p.text}</span>
+                                    </li>
+                                ))}
+                            </ol>
                         </div>
                     </div>
                     <div className="mt-8 flex flex-col gap-2 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
-                        <span>© {new Date().getFullYear()} {BRAND.org} · Eğitim çalışmasıdır, aktüerya raporu değildir.</span>
+                        <span>© {new Date().getFullYear()} {BRAND.org} · {DISCLAIMER_LINE}</span>
                         <a href={BRAND.url} target="_blank" rel="noopener noreferrer" className="no-print font-medium text-brand hover:text-brand-dark">cumhuriyetavukatlari.com</a>
                     </div>
                 </div>
@@ -300,7 +307,7 @@ function Notice() {
         <div role="note" className="border-b border-brand/20 bg-brand-soft print:hidden">
             <p className="mx-auto flex max-w-7xl items-start gap-2 px-4 sm:px-6 py-2.5 text-[12.5px] leading-snug text-brand-dark">
                 <ShieldAlert className="mt-px h-4 w-4 shrink-0" />
-                <span>{DISCLAIMER_SHORT}</span>
+                <span><strong className="font-semibold">{DISCLAIMER_TITLE}: </strong>{DISCLAIMER_SHORT}</span>
             </p>
         </div>
     );
@@ -327,7 +334,7 @@ function PrintHeader({ inputs }: { inputs: ActuarialInputs }) {
                 </div>
                 <p className="num text-xs text-muted text-right">Oluşturulma tarihi<br /><span className="text-ink font-medium">{d(new Date())}</span></p>
             </div>
-            <p className="mt-3 rounded-xl border border-brand/30 bg-brand-soft px-3 py-2 text-[11px] leading-snug text-brand-dark">{DISCLAIMER_SHORT}</p>
+            <p className="mt-3 rounded-xl border border-brand/30 bg-brand-soft px-3 py-2 text-[11px] leading-snug text-brand-dark"><strong>{DISCLAIMER_TITLE}: </strong>{DISCLAIMER_SHORT}</p>
             <h2 className="mt-5 mb-2 text-sm font-semibold uppercase tracking-wide text-muted">Dosya bilgileri</h2>
             <dl className="num grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-line bg-line text-sm">
                 {rows.map(([k, v]) => (

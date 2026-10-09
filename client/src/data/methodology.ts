@@ -19,10 +19,36 @@ export const BRAND = {
     url: "https://cumhuriyetavukatlari.com",
 } as const;
 
+/** Uyarının başlığı; sitede ve PDF'te kısa ve ayrıntılı metnin önünde yer alır */
+export const DISCLAIMER_TITLE = "Hukuki nitelik bildirimi";
+
 /** Kısa uyarı; sitenin üst şeridinde, giriş ekranında ve PDF'in her sayfasının üstünde gösterilir */
 export const DISCLAIMER_SHORT =
-    "Bu çalışma, Cumhuriyet Avukatları tarafından meslektaş dayanışması amacıyla Yargıtay kararları doğrultusunda hazırlanmış bir eğitim çalışmasıdır. Aktüerya raporu değildir; bilirkişi raporu yerine geçmez.";
+    "Bu hesap çalışması, Cumhuriyet Avukatları tarafından meslektaş dayanışması kapsamında, Yargıtay kararlarında benimsenen ilkeler esas alınarak hazırlanmış eğitim amaçlı bir modeldir. 6100 sayılı HMK m. 266 vd. uyarınca düzenlenen bilirkişi raporu veya m. 293 kapsamında uzman görüşü niteliği taşımaz; hukuki mütalaa yerine geçmez.";
 
-/** Ayrıntılı uyarı; sitenin altbilgisinde ve PDF'in ilk ve son sayfasında gösterilir */
-export const DISCLAIMER_FULL =
-    "Bu hesaplama, Cumhuriyet Avukatları tarafından meslektaş dayanışması amacıyla, Yargıtay kararları doğrultusunda hazırlanmış bir eğitim çalışmasıdır. Aktüerya raporu, bilirkişi raporu veya hukuki görüş niteliği taşımaz, bunların yerine geçmez ve delil olarak kullanılmak üzere hazırlanmamıştır. Sonuçlar yalnızca kullanıcının girdiği verilere göre otomatik olarak üretilir; dosyaya özgü koşullar, yargı kararlarındaki değişiklikler ve güncellenen asgari ücret verileri sonucu değiştirebilir. Somut dosyada tazminat hesabı, mahkemece görevlendirilen bilirkişi tarafından yapılır. Bu çalışmaya dayanılarak yapılan işlem ve verilen kararlardan Cumhuriyet Avukatları sorumlu tutulamaz.";
+/** Ayrıntılı uyarı maddeleri; sitenin altbilgisinde ve PDF'in ilk ve son sayfasında gösterilir */
+export const DISCLAIMER_POINTS: { title: string; text: string }[] = [
+    {
+        title: "Niteliği",
+        text: "Bu çalışma, sürekli ve geçici iş göremezlik zararının Yargıtay kararlarında benimsenen yöntemle (TRH-2010 yaşam tablosu, dönemsel net asgari ücret, bilinen ve bilinmeyen dönem ayrımı) nasıl hesaplandığını göstermek amacıyla, Cumhuriyet Avukatları tarafından meslektaş dayanışması kapsamında ücretsiz olarak sunulan eğitim amaçlı bir modeldir.",
+    },
+    {
+        title: "Delil değeri",
+        text: "6100 sayılı Hukuk Muhakemeleri Kanunu m. 266 vd. ve 6754 sayılı Bilirkişilik Kanunu uyarınca düzenlenen bilirkişi raporu, HMK m. 293 kapsamında uzman görüşü veya hukuki mütalaa niteliği taşımaz; yargı mercilerine ya da karşı tarafa delil olarak sunulmak üzere hazırlanmamıştır. Somut uyuşmazlıkta tazminat hesabı, mahkemece görevlendirilen bilirkişi tarafından yapılır.",
+    },
+    {
+        title: "Veri ve varsayımlar",
+        text: "Sonuçlar yalnızca kullanıcının girdiği verilere dayanır; maluliyet ve kusur oranları ile gelir bilgisi doğrulanmaz. Belgelendirilen gerçek gelir, Sosyal Güvenlik Kurumunca bağlanan gelirin mahsubu, müterafik kusur, hatır taşıması gibi indirim sebepleri ile mevzuat ve içtihat değişiklikleri sonucu değiştirebilir.",
+    },
+    {
+        title: "Sorumluluk",
+        text: "Bu çalışmaya dayanılarak yapılan işlem, verilen karar veya yapılan başvurulardan Cumhuriyet Avukatları sorumlu tutulamaz.",
+    },
+    {
+        title: "Kişisel veriler",
+        text: "Hesaplama tamamen kullanıcının tarayıcısında yapılır; girilen bilgiler herhangi bir sunucuya iletilmez ve saklanmaz.",
+    },
+];
+
+/** Altbilgi ve PDF alt satırında kullanılan tek cümlelik hatırlatma */
+export const DISCLAIMER_LINE = "Eğitim amaçlı modeldir; bilirkişi raporu, uzman görüşü veya hukuki mütalaa yerine geçmez.";

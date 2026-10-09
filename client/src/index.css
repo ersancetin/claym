@@ -20,10 +20,10 @@
   --color-bordo: rgba(139, 0, 0, 0.85);
   --color-known: #7f828a;
   --color-future: #0f766e;
-  --color-active: #c81d25;
+  --color-active: #1d4ed8;
   --color-passive: #a16207;
   --color-care: #7c3aed;
-  --color-temp: #2563eb;
+  --color-temp: #0891b2;
 
   --font-sans: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-heading: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;

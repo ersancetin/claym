@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { ArrowRight, Lock, ShieldAlert } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { BRAND, DISCLAIMER_SHORT } from "@/data/methodology";
+import { BRAND, DISCLAIMER_SHORT, DISCLAIMER_TITLE } from "@/data/methodology";
 import { cn } from "@/lib/utils";
 
 // Şifrenin SHA-256 özeti; şifrenin kendisi kaynakta yer almaz.
@@ -109,7 +109,7 @@ export function PasswordGate({ children }: { children: ReactNode }) {
                 </form>
                 <p className="mt-6 flex max-w-sm items-start gap-2 text-left text-xs leading-snug text-white/90">
                     <ShieldAlert className="mt-px h-3.5 w-3.5 shrink-0 text-white" />
-                    {DISCLAIMER_SHORT}
+                    <span><strong className="font-semibold text-white">{DISCLAIMER_TITLE}: </strong>{DISCLAIMER_SHORT}</span>
                 </p>
             </div>
         </div>

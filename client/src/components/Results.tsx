@@ -240,9 +240,9 @@ export function Timeline({ r }: { r: CalculationResult }) {
 /* ---------- Hesap tabloları ---------- */
 
 const typeLabel: Record<NonNullable<CompensationRow["type"]>, [string, string]> = {
-    active: ["Aktif", "bg-brand-soft text-active"],
+    active: ["Aktif", "bg-blue-50 text-active"],
     passive: ["Pasif", "bg-amber-50 text-passive"],
-    temp: ["Geçici", "bg-blue-50 text-temp"],
+    temp: ["Geçici", "bg-cyan-50 text-temp"],
     perm: ["Bilinen", "bg-slate-100 text-known"],
     caretaker: ["Bakıcı", "bg-violet-50 text-care"],
 };
