@@ -318,7 +318,7 @@ export class ActuarialEngine {
         
         // Yargıtay 4. HD 2024/5497 E., 2024/6426 K., 25.06.2024
         // 18 yaşından küçük ve kaza tarihinde çalışmayan kişiler için
-        // geçici iş göremezlik tazminatı hesaplanmaz (ama UI'da gösterilir, üstü çizili).
+        // geçici iş göremezlik zararı doğmaz; tutar hesaplanır, toplama dahil edilir ve uyarı gösterilir.
         const isMinor = this.isMinorAtAccident(birthDate, accidentDate);
         let minorWarning: string | undefined;
         
